@@ -3,7 +3,7 @@
 
 
 Internet Engineering Task Force (IETF)                        L. Colitti
-Request for Comments: 0000                                    J. Linkova
+Request for Comments: 10077                                   J. Linkova
 Updates: 6877, 8585                                               Google
 Category: Standards Track                                      T. Jensen
 ISSN: 2070-1721                                               Cloudflare
@@ -36,7 +36,7 @@ Status of This Memo
 
    Information about the current status of this document, any errata,
    and how to provide feedback on it may be obtained at
-   https://www.rfc-editor.org/info/rfc0000.
+   https://www.rfc-editor.org/info/rfc10077.
 
 Copyright Notice
 
@@ -670,7 +670,7 @@ Table of Contents
    |  464XLAT requirements:
    |  
    |  464XLAT-0: The IPv6 Transition CE Router SHOULD follow
-   |  recommendations provided in RFC XXXX).
+   |  recommendations provided in RFC 10077.
 
    OLD TEXT:
 

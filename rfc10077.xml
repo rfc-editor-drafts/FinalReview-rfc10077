@@ -629,7 +629,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
       multiple PIOs, the node <bcp14>SHOULD</bcp14> select a single PIO using the same
       algorithm as for choosing the source address for a destination within
       the selected NAT64 prefix (<xref target="RFC6724" />, updated by <xref
-      target="RFCYYY1" />).</t>
+      target="RFC10076" />).</t>
 
       <t>Discussion: This approach, leveraging the default source address
       selection algorithm (<xref target="RFC6724" section="5"/>), typically
@@ -647,7 +647,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
 
         <li>
           <t>For network-specific NAT64 prefixes within the known-local ULA
-          range <xref target="RFCYYY1"/>, the ULA
+          range <xref target="RFC10076"/>, the ULA
           prefix is preferred. This can be advantageous in home and enterprise
           environments where administrators intend to perform NAT64 for
           specific source prefixes only.</t>
@@ -891,7 +891,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
           destinations would be dropped.</t>
         </li>
 <!-- [rfced] Please review. Section 8 of
-[I-D.ietf-pquip-pqc-engineers] is titled "PQC Categories". Is this
+[RFC9958] is titled "PQC Categories". Is this
 still the correct section for this citation?
 
 Current:
@@ -901,7 +901,7 @@ Current:
    to perform man-in-the-middle attacks (active attack on insecure
    traffic or hoarding secure traffic for "Harvest Now, Decrypt Later"
    attacks for non-PQC secure traffic, see Section 8 of
-   [I-D.ietf-pquip-pqc-engineers]).
+   [RFC9958]).
 -->
         <li>
           <t>If the attacker intercepts traffic for the NAT64 prefix (e.g., by
@@ -910,7 +910,7 @@ Current:
           able to perform man-in-the-middle attacks (active attack on insecure
           traffic or hoarding secure traffic for "Harvest Now, Decrypt Later"
           attacks for non-PQC secure traffic, see Section 8 of <xref
-          target="I-D.ietf-pquip-pqc-engineers" />).</t>
+          target="RFC9958" />).</t>
         </li>
       </ul>
 
@@ -1053,12 +1053,12 @@ or left in their current order?
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9686.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9872.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9915.xml"/>
-        <!-- [rfced] [RFCYYY1]
+        <!-- [RFC10076]
              draft-ietf-6man-rfc6724-update-25
-             companion doc RFC YYY1
-             "blocked" as of 06/15/26
+             companion doc RFC 10076
+             "blocked" in Final Review as of 11/06/26
         -->
-        <reference anchor="RFCYYY1" target="https://www.rfc-editor.org/info/rfcYYY1">
+        <reference anchor="RFC10076" target="https://www.rfc-editor.org/info/rfc10076">
           <front>
             <title>Prioritizing known-local IPv6 ULAs through address selection policy</title>
             <author initials="N." surname="Buraglio" fullname="Nick Buraglio">
@@ -1072,8 +1072,8 @@ or left in their current order?
             </author>
             <date month='June' year='2026'/>
           </front>
-          <seriesInfo name="RFC" value="YYY1"/>
-          <seriesInfo name="DOI" value="10.17487/RFCYYY1"/>
+          <seriesInfo name="RFC" value="10076"/>
+          <seriesInfo name="DOI" value="10.17487/RFC10076"/>
         </reference>
       </references>
 
@@ -1089,34 +1089,30 @@ or left in their current order?
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8801.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8900.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8978.xml"/>
-        <!-- [rfced] [I-D.ietf-pquip-pqc-engineers]
-             draft-ietf-pquip-pqc-engineers-14
-             IESG State: RFC Ed Queue as of 06/15/26
-        -->
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-pquip-pqc-engineers.xml"/>
-        <!-- [rfced] [I-D.ietf-6man-slaac-renum]
-             draft-ietf-6man-slaac-renum-13
-             IESG State: I-D Exists as of 06/15/26
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9958.xml"/>
+        <!-- [I-D.ietf-6man-slaac-renum]
+             draft-ietf-6man-slaac-renum-14
+             IESG State: I-D Exists as of 11/06/26
         -->
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-6man-slaac-renum.xml"/>
-        <!-- [rfced] [I-D.ietf-v6ops-icmpext-xlat-v6only-source]
-             draft-ietf-v6ops-icmpext-xlat-v6only-source-01
-             IESG State:  AD Evaluation::Revised I-D Needed as of 06/15/26
+        <!-- [I-D.ietf-v6ops-icmpext-xlat-v6only-source]
+             draft-ietf-v6ops-icmpext-xlat-v6only-source-03
+             IESG State:  I-D exists as of 11/05/26
         -->
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-v6ops-icmpext-xlat-v6only-source.xml"/>
-        <!-- [rfced] [I-D.ietf-masque-connect-ip-dns]
-             draft-ietf-masque-connect-ip-dns-06
-             IESG State: I-D Exists as of 06/15/26
+        <!-- [I-D.ietf-masque-connect-ip-dns]
+             draft-ietf-masque-connect-ip-dns-07
+             IESG State: I-D Exists as of 11/05/26
         -->
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-masque-connect-ip-dns.xml"/>
-        <!-- [rfced] [I-D.ietf-v6ops-6mops]
-             draft-ietf-v6ops-6mops-07
-             IESG State: I-D Exists as of 06/15/26
+        <!-- [I-D.ietf-v6ops-6mops]
+             draft-ietf-v6ops-6mops-12
+             IESG State: In Last Call (ends 2026-11-12) as of 11/05/26
         -->
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-v6ops-6mops.xml"/>
-        <!-- [rfced] [I-D.link-6man-gulla]
+        <!-- [I-D.link-6man-gulla]
              draft-link-6man-gulla-01
-             IESG State: Expired as of 06/15/26
+             IESG State: Expired 4 September 2025 as of 11/05/26
         -->
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.link-6man-gulla.xml"/>
       </references>

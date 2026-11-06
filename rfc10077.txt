@@ -2,17 +2,16 @@
 
 
 
-IPv6 operations                                               L. Colitti
-Internet-Draft                                                J. Linkova
-Updates: 6877, 8585 (if approved)                                 Google
-Intended status: Standards Track                               T. Jensen
-Expires: 10 May 2027                                          Cloudflare
-                                                         6 November 2026
+Internet Engineering Task Force (IETF)                        L. Colitti
+Request for Comments: 10077                                   J. Linkova
+Updates: 6877, 8585                                               Google
+Category: Standards Track                                      T. Jensen
+ISSN: 2070-1721                                               Cloudflare
+                                                               June 2026
 
 
        464XLAT Customer-side Translator (CLAT): Node Behavior and
                             Recommendations
-                       draft-ietf-v6ops-claton-16
 
 Abstract
 
@@ -20,27 +19,24 @@ Abstract
    across an IPv6-only network.  The solution involves two functional
    elements: a provider-side translator (PLAT) and a customer-side
    translator (CLAT).  This document updates the 464XLAT specification
-   (RFC6877) and Requirements for IPv6 Customer Edge Routers (RFC8585)
+   (RFC 6877) and Requirements for IPv6 Customer Edge Routers (RFC 8585)
    by further defining CLAT node behavior and IPv6 Customer Edge Routers
    to support IPv4-as-a-Service by providing recommendations for node
    developers on enabling and disabling CLAT.
 
 Status of This Memo
 
-   This Internet-Draft is submitted in full conformance with the
-   provisions of BCP 78 and BCP 79.
+   This is an Internet Standards Track document.
 
-   Internet-Drafts are working documents of the Internet Engineering
-   Task Force (IETF).  Note that other groups may also distribute
-   working documents as Internet-Drafts.  The list of current Internet-
-   Drafts is at https://datatracker.ietf.org/drafts/current/.
+   This document is a product of the Internet Engineering Task Force
+   (IETF).  It represents the consensus of the IETF community.  It has
+   received public review and has been approved for publication by the
+   Internet Engineering Steering Group (IESG).  Further information on
+   Internet Standards is available in Section 2 of RFC 7841.
 
-   Internet-Drafts are draft documents valid for a maximum of six months
-   and may be updated, replaced, or obsoleted by other documents at any
-   time.  It is inappropriate to use Internet-Drafts as reference
-   material or to cite them other than as "work in progress."
-
-   This Internet-Draft will expire on 10 May 2027.
+   Information about the current status of this document, any errata,
+   and how to provide feedback on it may be obtained at
+   https://www.rfc-editor.org/info/rfc10077.
 
 Copyright Notice
 
@@ -48,49 +44,42 @@ Copyright Notice
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
-   Provisions Relating to IETF Documents (https://trustee.ietf.org/
-   license-info) in effect on the date of publication of this document.
-
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 1]
-
-Internet-Draft                   claton                    November 2026
-
-
-   Please review these documents carefully, as they describe your rights
-   and restrictions with respect to this document.  Code Components
-   extracted from this document must include Revised BSD License text as
-   described in Section 4.e of the Trust Legal Provisions and are
-   provided without warranty as described in the Revised BSD License.
+   Provisions Relating to IETF Documents
+   (https://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Revised BSD License text as described in Section 4.e of the
+   Trust Legal Provisions and are provided without warranty as described
+   in the Revised BSD License.
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
-   2.  Requirements Language . . . . . . . . . . . . . . . . . . . .   3
-   3.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
-   4.  Enabling CLAT . . . . . . . . . . . . . . . . . . . . . . . .   4
-   5.  Disabling CLAT  . . . . . . . . . . . . . . . . . . . . . . .   6
-   6.  CLAT Addresses Considerations . . . . . . . . . . . . . . . .   6
-     6.1.  CLAT IPv4 Addresses . . . . . . . . . . . . . . . . . . .   7
-     6.2.  CLAT IPv6 Addresses . . . . . . . . . . . . . . . . . . .   8
-       6.2.1.  Obtaining CLAT IPv6 Addresses . . . . . . . . . . . .   8
-       6.2.2.  CLAT vs non-CLAT IPv6 Addresses Behaviour . . . . . .  10
-   7.  CLAT and Multiple Prefixes per Interface  . . . . . . . . . .  11
-     7.1.  Link Renumbering  . . . . . . . . . . . . . . . . . . . .  13
-   8.  MTU Considerations  . . . . . . . . . . . . . . . . . . . . .  14
-   9.  Updates to Existing RFCs  . . . . . . . . . . . . . . . . . .  14
-     9.1.  Updates to RFC6877  . . . . . . . . . . . . . . . . . . .  14
-     9.2.  Updates to RFC8585  . . . . . . . . . . . . . . . . . . .  15
-   10. Operational Considerations  . . . . . . . . . . . . . . . . .  17
-   11. Security Considerations . . . . . . . . . . . . . . . . . . .  17
-   12. Privacy Considerations  . . . . . . . . . . . . . . . . . . .  19
-   13. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  19
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  22
-   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  24
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  24
+   1.  Introduction
+   2.  Requirements Language
+   3.  Terminology
+   4.  Enabling CLAT
+   5.  Disabling CLAT
+   6.  CLAT Addresses Considerations
+     6.1.  CLAT IPv4 Addresses
+     6.2.  CLAT IPv6 Addresses
+       6.2.1.  Obtaining CLAT IPv6 Addresses
+       6.2.2.  CLAT vs non-CLAT IPv6 Addresses Behaviour
+   7.  CLAT and Multiple Prefixes per Interface
+     7.1.  Link Renumbering
+   8.  MTU Considerations
+   9.  Updates to Existing RFCs
+     9.1.  Updates to RFC 6877
+     9.2.  Updates to RFC 8585
+   10. Operational Considerations
+   11. Security Considerations
+   12. Privacy Considerations
+   13. IANA Considerations
+   14. References
+     14.1.  Normative References
+     14.2.  Informative References
+   Acknowledgements
+   Authors' Addresses
 
 1.  Introduction
 
@@ -106,14 +95,6 @@ Table of Contents
    IPv6-only hosts used to be rather uncommon outside of mobile networks
    and datacenters.  Even if a network offers provider-side translator
    (PLAT) functionality in the form of NAT64 [RFC6146], hosts (desktops,
-
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 2]
-
-Internet-Draft                   claton                    November 2026
-
-
    laptops, etc.) still needed the network to provide IPv4 connectivity,
    as otherwise applications which require IPv4 would fail.  However, as
    more and more operating systems outside of the 3GPP world support
@@ -148,8 +129,8 @@ Internet-Draft                   claton                    November 2026
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
 3.  Terminology
@@ -157,35 +138,28 @@ Internet-Draft                   claton                    November 2026
    This document reuses most of the terminology from Section 2 of
    [RFC6877] and additionally defines the following terms:
 
-   *  CLAT Node: a node (a host or a router) that performs CLAT
-      functions by running one or multiple CLAT instances (e.g., one
-      CLAT instance per interface).  "CLAT" is also used in this
-      document to describe the functionality provided by a CLAT Node as
-      a commonly understood shorthand.
+   CLAT Node:  a node (a host or a router) that performs CLAT functions
+      by running one or multiple CLAT instances (e.g., one CLAT instance
+      per interface).  "CLAT" is also used in this document to describe
+      the functionality provided by a CLAT Node as a commonly understood
+      shorthand.
 
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 3]
-
-Internet-Draft                   claton                    November 2026
-
-
-   *  IPv4-only application: An application that requires the presence
-      of an IPv4 address and/or IPv4 default route to operate.  Examples
+   IPv4-only application:  An application that requires the presence of
+      an IPv4 address and/or IPv4 default route to operate.  Examples
       include, but are not limited to, applications using IPv4 address
       literals or opening IPv4-only sockets.
 
-   *  IPv6-only network: A network that does not assign IPv4 addresses
-      to hosts and facilitates connectivity to IPv4-only destinations
-      using NAT64 [RFC6146] as it is required by the 464XLAT
-      architecture [RFC6877].
+   IPv6-only network:  A network that does not assign IPv4 addresses to
+      hosts and facilitates connectivity to IPv4-only destinations using
+      NAT64 [RFC6146] as it is required by the 464XLAT architecture
+      [RFC6877].
 
-   *  Native IPv4 (such as in 'native IPv4 connectivity' or 'native IPv4
-      default gateway'): IPv4 connectivity provided by the network
-      without using any form of IPv4-as-a-Service or IP address family
+   Native IPv4 (such as in 'native IPv4 connectivity' or 'native IPv4
+   default gateway'):  IPv4 connectivity provided by the network without
+      using any form of IPv4-as-a-Service or IP address family
       translation mechanisms (such as 464XLAT).
 
-   *  ULA: Unique Local Addresses [RFC4193].
+   ULA:  Unique Local Addresses [RFC4193].
 
 4.  Enabling CLAT
 
@@ -215,16 +189,6 @@ Internet-Draft                   claton                    November 2026
    whose operational utility will diminish as IPv4 dependencies become
    less common.  Even where CLAT is supported, default enablement may
    eventually become unnecessary.
-
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 4]
-
-Internet-Draft                   claton                    November 2026
-
 
    A node may have multiple IPv6-only interfaces (for example, a mobile
    phone can be connected to an IPv6-only Wi-Fi network and to an
@@ -274,14 +238,6 @@ Internet-Draft                   claton                    November 2026
    MUST follow recommendations from Section 4 of [RFC7335] to avoid IPv4
    address space conflicts.
 
-
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 5]
-
-Internet-Draft                   claton                    November 2026
-
-
 5.  Disabling CLAT
 
    It is possible that after a CLAT instance has started, native IPv4
@@ -323,20 +279,6 @@ Internet-Draft                   claton                    November 2026
    NOT be a default behaviour, especially for unmanaged nodes.
 
 6.  CLAT Addresses Considerations
-
-
-
-
-
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 6]
-
-Internet-Draft                   claton                    November 2026
-
 
 6.1.  CLAT IPv4 Addresses
 
@@ -387,13 +329,6 @@ Internet-Draft                   claton                    November 2026
    own subnet, rather than being part of a subnet delineated by the
    prefix.
 
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 7]
-
-Internet-Draft                   claton                    November 2026
-
-
    It should be noted that 192.0.0.0/29 is shared between multiple IPv4
    continuity solutions such as 464XLAT and DS-Lite (see [RFC7335]).
    For example, Section 10 of [RFC6333] reserves 192.0.0.1 for the Dual-
@@ -434,21 +369,13 @@ Internet-Draft                   claton                    November 2026
       MUST either:
 
       -  Obtain a dedicated prefix that satisfies the requirements in
-         section 2.2 of [RFC6052] (e.g., via DHCPv6-PD), and statelessly
+         Section 2.2 of [RFC6052] (e.g., via DHCPv6-PD), and statelessly
          translate downstream IPv4 addresses to IPv6 addresses in this
          prefix.
 
       -  Perform stateful NAT44 from the downstream IPv4 addresses to a
          single IPv4 address and then perform stateless translation of
          that single IPv4 address to a single dedicated IPv6 address.
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 8]
-
-Internet-Draft                   claton                    November 2026
-
 
    *  If the CLAT instance only uses a single IPv4 address (including
       scenarios where the node is performing stateful NAT44 to that
@@ -491,21 +418,6 @@ Internet-Draft                   claton                    November 2026
    Discussion of such architectures is beyond the scope of this
    document.
 
-
-
-
-
-
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                  [Page 9]
-
-Internet-Draft                   claton                    November 2026
-
-
    If the dedicated CLAT address is obtained via Stateless Address
    Autoconfiguration (SLAAC, [RFC4862]), the CLAT instance SHOULD choose
    the interface ID in such a way that the resulting CLAT IPv6 address
@@ -543,52 +455,44 @@ Internet-Draft                   claton                    November 2026
    *  The node MUST perform Duplicate Address Detection (DAD) for each
       dedicated CLAT address (Section 5.4 of [RFC4862]).
 
-      -  Justification: performing DAD minimizes loss of connectivity in
-         the unlikely event of address collision.  Additionally, real
-         world deployment experience shows that network infrastructure
-         devices mandate a DAD packet from the client before enabling
-         network access.
+      Justification: performing DAD minimizes loss of connectivity in
+      the unlikely event of address collision.  Additionally, real world
+      deployment experience shows that network infrastructure devices
+      mandate a DAD packet from the client before enabling network
+      access.
 
    *  The node MUST process unicast and multicast Neighbor Solicitations
       (NSes) for the node's CLAT addresses the same way the node would
       process NSes for a non-CLAT address.  This is to avoid unexpected
       packet loss for applications.
 
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 10]
-
-Internet-Draft                   claton                    November 2026
-
-
-      -  Justification: A simple example is if a node doesn't respond to
-         unicast NSes, anytime the first-hop router gets a packet for
-         the CLAT address and its Neighbor Cache entry is 'STALE'
-         (Section 7.3.2 of [RFC4861]), the Neighbor Unreachability
-         Detection process (Section 7.3.3 of [RFC4861]) will delete that
-         CLAT address's cache entry.  This forces the address resolution
-         process to restart from scratch.  Until resolution finishes,
-         traffic for the CLAT address might drop, leading to a degraded
-         user experience, especially for applications sensitive to
-         jitter and packet loss.
+      Justification: A simple example is if a node doesn't respond to
+      unicast NSes, anytime the first-hop router gets a packet for the
+      CLAT address and its Neighbor Cache entry is 'STALE'
+      (Section 7.3.2 of [RFC4861]), the Neighbor Unreachability
+      Detection process (Section 7.3.3 of [RFC4861]) will delete that
+      CLAT address's cache entry.  This forces the address resolution
+      process to restart from scratch.  Until resolution finishes,
+      traffic for the CLAT address might drop, leading to a degraded
+      user experience, especially for applications sensitive to jitter
+      and packet loss.
 
    *  If the node supports Gratuitous Neighbor Advertisements [RFC9131],
       the node SHOULD send them for the CLAT addresses.
 
-      -  Justification: not following this recommendation leads to user-
-         visible packet loss when the CLAT instance starts receiving
-         traffic after a period of inactivity, or when connected to the
-         network for the first time.  The problem is discussed in
-         Section 2 of [RFC9131].
+      Justification: not following this recommendation leads to user-
+      visible packet loss when the CLAT instance starts receiving
+      traffic after a period of inactivity, or when connected to the
+      network for the first time.  The problem is discussed in Section 2
+      of [RFC9131].
 
    *  The node that has the address registration using DHCPv6 [RFC9686]
       enabled MUST register the CLAT addresses the same way as non-CLAT
       addresses, if the network supports the registration.
 
-      -  Justification: not registering CLAT addresses reduces traffic
-         visibility for network operators, which complicates
-         troubleshooting and forensics, as discussed in [RFC9686].
+      Justification: not registering CLAT addresses reduces traffic
+      visibility for network operators, which complicates
+      troubleshooting and forensics, as discussed in [RFC9686].
 
 7.  CLAT and Multiple Prefixes per Interface
 
@@ -610,14 +514,6 @@ Internet-Draft                   claton                    November 2026
    routers (e.g., generating a CLAT address from prefix_A but using
    PREF64_B for translation) can lead to packet loss.  For example, if
    packets with source addresses from prefix_A are sent to router_B,
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 11]
-
-Internet-Draft                   claton                    November 2026
-
-
    that router (or the uplink network) might drop the packets according
    to BCP 38 [RFC2827].  Similarly, if the CLAT instance uses PREF64_A,
    advertised by router_A, but those packets are sent to router_B, that
@@ -656,8 +552,7 @@ Internet-Draft                   claton                    November 2026
    When a node creates a single CLAT instance and must choose between
    multiple PIOs, the node SHOULD select a single PIO using the same
    algorithm as for choosing the source address for a destination within
-   the selected NAT64 prefix ([RFC6724], updated by
-   [I-D.ietf-6man-rfc6724-update]).
+   the selected NAT64 prefix ([RFC6724], updated by [RFC10076]).
 
    Discussion: This approach, leveraging the default source address
    selection algorithm (Section 5 of [RFC6724]), typically results in
@@ -666,23 +561,15 @@ Internet-Draft                   claton                    November 2026
    aligns with default source address selection for native IPv6 flows,
    offering the following advantages:
 
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 12]
-
-Internet-Draft                   claton                    November 2026
-
-
    *  When using the well-known NAT64 prefix (64:ff9b::/96), non-ULA
       prefixes are preferred over ULA prefixes by default.  This is
       beneficial as ULA source packets may not reach PLAT devices.
 
    *  For network-specific NAT64 prefixes within the known-local ULA
-      range ([I-D.ietf-6man-rfc6724-update]), the ULA prefix is
-      preferred.  This can be advantageous in home and enterprise
-      environments where administrators intend to perform NAT64 for
-      specific source prefixes only.
+      range [RFC10076], the ULA prefix is preferred.  This can be
+      advantageous in home and enterprise environments where
+      administrators intend to perform NAT64 for specific source
+      prefixes only.
 
    *  For network-specific NAT64 prefixes within the operator's global
       non-ULA range, the longest prefix match selects the PIO, ensuring
@@ -721,14 +608,7 @@ Internet-Draft                   claton                    November 2026
    link renumbering events:
 
    *  A prefix used to form the CLAT address becomes deprecated or
-      invalid ([RFC4862]).
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 13]
-
-Internet-Draft                   claton                    November 2026
-
+      invalid [RFC4862].
 
    *  The router (or routers) advertising the PIO used to form the CLAT
       address
@@ -764,139 +644,90 @@ Internet-Draft                   claton                    November 2026
    the CLAT instance SHOULD present IPv4-only applications with an IPv4
    MTU which is 28 bytes smaller than the IPv6 MTU of the interface the
    instance is running on because anything higher risks undesirable IP
-   fragmentation ([RFC8900]) and anything lower artifically restricts
+   fragmentation [RFC8900] and anything lower artifically restricts
    packet sizes for no benefit.
 
 9.  Updates to Existing RFCs
 
-9.1.  Updates to RFC6877
+9.1.  Updates to RFC 6877
 
    This document updates Section 6.3 of [RFC6877] by relaxing the
    requirement to acquire a dedicated /64 prefix for the purpose of
    sending and receiving statelessly translated packets.  More details
    on the recommended node behaviour can be found in Section 6.2.1.
 
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 14]
-
-Internet-Draft                   claton                    November 2026
-
-
-9.2.  Updates to RFC8585
+9.2.  Updates to RFC 8585
 
    This document makes the following changes to Section 3.2.1 of
    [RFC8585]:
 
    OLD TEXT:
 
-   ===
-
-   464XLAT requirements:
-
-   ===
+   |  464XLAT requirements:
 
    NEW TEXT:
 
-   ===
-
-   464XLAT requirements:
-
-   464XLAT-0: The IPv6 Transition CE Router SHOULD follow
-   recommendations provided in THIS DOCUMENT (note to the RFC Editor to
-   add a reference to this document's RFC number).
-
-   ===
+   |  464XLAT requirements:
+   |  
+   |  464XLAT-0: The IPv6 Transition CE Router SHOULD follow
+   |  recommendations provided in RFC 10077.
 
    OLD TEXT:
 
-   ===
-
-   464XLAT-4: The IPv6 Transition CE Router MUST implement [RFC7050]
-   ("Discovery of the IPv6 Prefix Used for IPv6 Address Synthesis") in
-   order to discover the provider-side translator (PLAT) translation
-   IPv4 and IPv6 prefix(es)/suffix(es).
-
-   ===
+   |  464XLAT-4: The IPv6 Transition CE Router MUST implement [RFC7050]
+   |  ("Discovery of the IPv6 Prefix Used for IPv6 Address Synthesis")
+   |  in order to discover the provider-side translator (PLAT)
+   |  translation IPv4 and IPv6 prefix(es)/suffix(es).
 
    NEW TEXT:
 
-   ===
-
-   464XLAT-4: The IPv6 Transition CE Router MUST implement [RFC8781]
-   ("Discovering PREF64 in Router Advertisements") and SHOULD implement
-   [RFC7050] ("Discovery of the IPv6 Prefix Used for IPv6 Address
-   Synthesis") in order to discover the provider-side translator (PLAT)
-   translation IPv4 and IPv6 prefix(es)/suffix(es).
-
-   ===
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 15]
-
-Internet-Draft                   claton                    November 2026
-
+   |  464XLAT-4: The IPv6 Transition CE Router MUST implement [RFC8781]
+   |  ("Discovering PREF64 in Router Advertisements") and SHOULD
+   |  implement [RFC7050] ("Discovery of the IPv6 Prefix Used for IPv6
+   |  Address Synthesis") in order to discover the provider-side
+   |  translator (PLAT) translation IPv4 and IPv6 prefix(es)/suffix(es).
 
    OLD TEXT:
 
-   ===
+   |  464XLAT-6: If the network provides several choices for the
+   |  discovery/learning of the NAT64 prefix, the priority to use one or
+   |  the other MUST follow this order: 1) [RFC7225] and 2) [RFC7050].
+   |  
+   |  The NAT64 prefix could be discovered by means of the method
+   |  defined in [RFC7050] only if the service provider uses DNS64
+   |  [RFC6147].  It may be the case that the service provider does not
+   |  use or does not trust DNS64 [RFC6147] because the DNS
+   |  configuration at the CE (or hosts behind the CE) can be modified
+   |  by the customer.  In that case, the service provider may opt to
+   |  configure the NAT64 prefix by means of the option defined in
+   |  [RFC7225].  This can also be used if the service provider uses
+   |  DNS64 [RFC6147].
 
-   464XLAT-6: If the network provides several choices for the discovery/
-   learning of the NAT64 prefix, the priority to use one or the other
-   MUST follow this order: 1) [RFC7225] and 2) [RFC7050].
+   NEW TEXT:
 
-   The NAT64 prefix could be discovered by means of the method defined
-   in [RFC7050] only if the service provider uses DNS64 [RFC6147].  It
-   may be the case that the service provider does not use or does not
-   trust DNS64 [RFC6147] because the DNS configuration at the CE (or
-   hosts behind the CE) can be modified by the customer.  In that case,
-   the service provider may opt to configure the NAT64 prefix by means
-   of the option defined in [RFC7225].  This can also be used if the
-   service provider uses DNS64 [RFC6147].
-
-   ===
-
-   NEW TEXT
-
-   ===
-
-   464XLAT-6: If the network provides several choices for the discovery/
-   learning of the NAT64 prefix, the priority to use one or the other
-   MUST follow this order: 1)[RFC7225] 2)[RFC8781] and 3)[RFC7050].
-
-   464XLAT-7: If the IPv6 Transition CE Router performs CLAT functions
-   it SHOULD also include the PREF64 option containing the PLAT prefix
-   in Router Advertisements ([RFC8781]) sent via the LAN interfaces.  If
-   the IPv6 Transition CE Router acts as a DHCP server it SHOULD enable
-   DHCP Option 108 ([RFC8925]) processing.  The router SHOULD have a
-   configuration knob to disable DHCP Option 108 processing.
-
-   [RFC8781] allows the service provider to signal NAT64 prefix
-   independently from DNS64 presence.  At the same time the NAT64 prefix
-   could be discovered by means of the method defined in [RFC7050] only
-   if the service provider uses DNS64 [RFC6147].  It may be the case
-   that the service provider does not use or does not trust DNS64
-   [RFC6147] because the DNS configuration at the CE (or hosts behind
-   the CE) can be modified by the customer.  In that case, the service
-   provider may opt to configure the NAT64 prefix by means of the option
-   defined in [RFC7225].  This can also be used if the service provider
-   uses DNS64 [RFC6147].
-
-   ===
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 16]
-
-Internet-Draft                   claton                    November 2026
-
+   |  464XLAT-6: If the network provides several choices for the
+   |  discovery/learning of the NAT64 prefix, the priority to use one or
+   |  the other MUST follow this order: 1) [RFC7225], 2) [RFC8781], and
+   |  3) [RFC7050].
+   |  
+   |  464XLAT-7: If the IPv6 Transition CE Router performs CLAT
+   |  functions it SHOULD also include the PREF64 option containing the
+   |  PLAT prefix in Router Advertisements [RFC8781] sent via the LAN
+   |  interfaces.  If the IPv6 Transition CE Router acts as a DHCP
+   |  server it SHOULD enable DHCP Option 108 [RFC8925] processing.  The
+   |  router SHOULD have a configuration knob to disable DHCP Option 108
+   |  processing.
+   |  
+   |  [RFC8781] allows the service provider to signal NAT64 prefix
+   |  independently from DNS64 presence.  At the same time the NAT64
+   |  prefix could be discovered by means of the method defined in
+   |  [RFC7050] only if the service provider uses DNS64 [RFC6147].  It
+   |  may be the case that the service provider does not use or does not
+   |  trust DNS64 [RFC6147] because the DNS configuration at the CE (or
+   |  hosts behind the CE) can be modified by the customer.  In that
+   |  case, the service provider may opt to configure the NAT64 prefix
+   |  by means of the option defined in [RFC7225].  This can also be
+   |  used if the service provider uses DNS64 [RFC6147].
 
 10.  Operational Considerations
 
@@ -921,7 +752,7 @@ Internet-Draft                   claton                    November 2026
       might be able to perform man-in-the-middle attacks (active attack
       on insecure traffic or hoarding secure traffic for "Harvest Now,
       Decrypt Later" attacks for non-PQC secure traffic, see Section 8
-      of [I-D.ietf-pquip-pqc-engineers]).
+      of [RFC9958]).
 
    Rogue RAs can also disturb traffic to destinations that support both
    IPv4 and IPv6 by causing IPv6 through an attacker's PLAT to be used
@@ -929,14 +760,14 @@ Internet-Draft                   claton                    November 2026
 
    Using the PREF64 RA option to detect PLAT presence and the NAT64
    prefix is less prone to such attacks than DNS-based detection
-   ([RFC7050]), as the attacker needs to be on-link and be able to
-   bypass layer-2 security features such as RA Guard (see Section 4 of
+   [RFC7050], as the attacker needs to be on-link and be able to bypass
+   layer-2 security features such as RA Guard (see Section 4 of
    [RFC9872] for more details).  Therefore Section 4 recommends the
    PREF64 RA option as a preferred way to detect PLAT presence, in
-   accordance with [RFC9872].  If DNS-based detection ([RFC7050]) is
+   accordance with [RFC9872].  If DNS-based detection [RFC7050] is
    necessary for other deployment reasons, the risk of local attack can
    be reduced by using encrypted DNS protocols and advertising the
-   resolvers using RA options ([RFC9463]).
+   resolvers using RA options [RFC9463].
 
    The attack vector described above is not specific to 464XLAT
    deployments: security implications of rogue RAs have been discussed
@@ -946,14 +777,6 @@ Internet-Draft                   claton                    November 2026
    deployment are inherently IPv6-ignorant, and consequently might lack
    IPv6 security features.  In such networks IPv6-enabled endpoints may
    be inadvertently exposed to link-local IPv6 connectivity.  This
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 17]
-
-Internet-Draft                   claton                    November 2026
-
-
    unintended exposure can facilitate PLAT presence signal
    falsification, as described above.  This document mitigates this risk
    by recommending that endpoints disable CLAT when the network provides
@@ -995,20 +818,6 @@ Internet-Draft                   claton                    November 2026
    nodes operating in environments where rogue RAs are no more likely
    than rogue DHCP servers might choose to keep CLAT enabled, while
    still complying with this specification.
-
-
-
-
-
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 18]
-
-Internet-Draft                   claton                    November 2026
-
 
 12.  Privacy Considerations
 
@@ -1055,17 +864,6 @@ Internet-Draft                   claton                    November 2026
               DOI 10.17487/RFC4861, September 2007,
               <https://www.rfc-editor.org/info/rfc4861>.
 
-
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 19]
-
-Internet-Draft                   claton                    November 2026
-
-
    [RFC4862]  Thomson, S., Narten, T., and T. Jinmei, "IPv6 Stateless
               Address Autoconfiguration", RFC 4862,
               DOI 10.17487/RFC4862, September 2007,
@@ -1110,17 +908,6 @@ Internet-Draft                   claton                    November 2026
    [RFC7335]  Byrne, C., "IPv4 Service Continuity Prefix", RFC 7335,
               DOI 10.17487/RFC7335, August 2014,
               <https://www.rfc-editor.org/info/rfc7335>.
-
-
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 20]
-
-Internet-Draft                   claton                    November 2026
-
 
    [RFC7915]  Bao, C., Li, X., Baker, F., Anderson, T., and F. Gont,
               "IP/ICMP Translation Algorithm", RFC 7915,
@@ -1170,14 +957,6 @@ Internet-Draft                   claton                    November 2026
               Addresses Using DHCPv6", RFC 9686, DOI 10.17487/RFC9686,
               December 2024, <https://www.rfc-editor.org/info/rfc9686>.
 
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 21]
-
-Internet-Draft                   claton                    November 2026
-
-
    [RFC9872]  Buraglio, N., Jensen, T., and J. Linkova, "Recommendations
               for Discovering IPv6 Prefix Used for IPv6 Address
               Synthesis", RFC 9872, DOI 10.17487/RFC9872, September
@@ -1188,13 +967,10 @@ Internet-Draft                   claton                    November 2026
               (DHCPv6)", STD 102, RFC 9915, DOI 10.17487/RFC9915,
               January 2026, <https://www.rfc-editor.org/info/rfc9915>.
 
-   [I-D.ietf-6man-rfc6724-update]
-              Buraglio, N., Chown, T., and J. Duncan, "Prioritizing
+   [RFC10076] Buraglio, N., Chown, T., and J. Duncan, "Prioritizing
               known-local IPv6 ULAs through address selection policy",
-              Work in Progress, Internet-Draft, draft-ietf-6man-rfc6724-
-              update-25, 11 August 2025,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-6man-
-              rfc6724-update-25>.
+              RFC 10076, DOI 10.17487/RFC10076, June 2026,
+              <https://www.rfc-editor.org/info/rfc10076>.
 
 14.2.  Informative References
 
@@ -1226,14 +1002,6 @@ Internet-Draft                   claton                    November 2026
               DOI 10.17487/RFC7225, May 2014,
               <https://www.rfc-editor.org/info/rfc7225>.
 
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 22]
-
-Internet-Draft                   claton                    November 2026
-
-
    [RFC7556]  Anipko, D., Ed., "Multiple Provisioning Domain
               Architecture", RFC 7556, DOI 10.17487/RFC7556, June 2015,
               <https://www.rfc-editor.org/info/rfc7556>.
@@ -1253,13 +1021,10 @@ Internet-Draft                   claton                    November 2026
               Renumbering Events", RFC 8978, DOI 10.17487/RFC8978, March
               2021, <https://www.rfc-editor.org/info/rfc8978>.
 
-   [I-D.ietf-pquip-pqc-engineers]
-              Banerjee, A., Reddy.K, T., Schoinianakis, D., Hollebeek,
+   [RFC9958]  Banerjee, A., Reddy.K, T., Schoinianakis, D., Hollebeek,
               T., and M. Ounsworth, "Post-Quantum Cryptography for
-              Engineers", Work in Progress, Internet-Draft, draft-ietf-
-              pquip-pqc-engineers-14, 25 August 2025,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-pquip-
-              pqc-engineers-14>.
+              Engineers", RFC 9958, DOI 10.17487/RFC9958, June 2026,
+              <https://www.rfc-editor.org/info/rfc9958>.
 
    [I-D.ietf-6man-slaac-renum]
               Gont, F., Zorz, J., and R. Patterson, "Improving the
@@ -1276,19 +1041,6 @@ Internet-Draft                   claton                    November 2026
               v6ops-icmpext-xlat-v6only-source-03, 2 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-v6ops-
               icmpext-xlat-v6only-source-03>.
-
-
-
-
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 23]
-
-Internet-Draft                   claton                    November 2026
-
 
    [I-D.ietf-masque-connect-ip-dns]
               Schinazi, D. and Y. Rosomakho, "DNS and PREF64
@@ -1315,10 +1067,10 @@ Acknowledgements
 
    Thanks to Mohamed Boucadair, Ondrej Caletka, Stuart Cheshire,
    Menachem Dodge, Jeremy Duncan, Wesley Eddy, Goetz Goerisch, James
-   Harr , Jason Healy, Ed Horley, KAWASHIMA Masanobu, Ted Lemon, Nicolai
+   Harr, Jason Healy, Ed Horley, KAWASHIMA Masanobu, Ted Lemon, Nicolai
    Leymann, George Michaelson, Jordi Palet, Michael Richardson, Nathan
-   Sherrard, Dieter Siegmund, Robert Sparks, Dave Thaler, Philipp S.
-   Tiesel, Eric Vyncke for the discussions, the input, and all
+   Sherrard, Dieter Siegmund, Robert Sparks, Dave Thaler, Philipp
+   S. Tiesel, and Eric Vyncke for the discussions, the input, and all
    contribution.
 
 Authors' Addresses
@@ -1338,63 +1090,6 @@ Authors' Addresses
    Email: furry13@gmail.com, furry@google.com
 
 
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 24]
-
-Internet-Draft                   claton                    November 2026
-
-
    Tommy Jensen
    Cloudflare
    Email: tojens.ietf@gmail.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Colitti, et al.            Expires 10 May 2027                 [Page 25]

@@ -1,0 +1,1213 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<?xml-model href="rfc7991bis.rnc"?>
+<!-- Required for schema validation and schema-aware editing -->
+<!-- <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?> -->
+<!-- This third-party XSLT can be enabled for direct transformations in XML processors, including most browsers -->
+<!-- If further character entities are required then they should be added to the DOCTYPE above.
+     Use of an external entity file is not recommended. -->
+<rfc category="std" docName="draft-ietf-v6ops-claton-16" ipr="trust200902"
+     obsoletes="" submissionType="IETF" updates="6877, 8585" version="3"
+     xml:lang="en">
+  <front>
+    <title abbrev="claton">464XLAT Customer-side Translator (CLAT): Node
+    Behavior and Recommendations</title>
+
+    <seriesInfo name="Internet-Draft" value="draft-ietf-v6ops-claton-16" />
+
+    <author fullname="Lorenzo Colitti" initials="L." surname="Colitti">
+      <organization>Google</organization>
+
+      <address>
+        <postal>
+          <street>Shibuya 3-21-3</street>
+
+          <country>Japan</country>
+        </postal>
+
+        <email>lorenzo@google.com</email>
+      </address>
+    </author>
+
+    <author fullname="Jen Linkova" initials="J" surname="Linkova">
+      <organization>Google</organization>
+
+      <address>
+        <postal>
+          <!-- Reorder these if your country does things differently -->
+
+          <street>1 Darling Island Rd</street>
+
+          <city>Pyrmont</city>
+
+          <region>NSW</region>
+
+          <code>2009</code>
+
+          <country>AU</country>
+        </postal>
+
+        <email>furry13@gmail.com</email>
+
+        <email>furry@google.com</email>
+      </address>
+    </author>
+
+    <author fullname="Tommy Jensen" initials="T." surname="Jensen">
+      <organization>Cloudflare</organization>
+
+      <address>
+        <email>tojens.ietf@gmail.com</email>
+      </address>
+    </author>
+
+    <date year="2026" />
+
+    <area>Ops</area>
+
+    <workgroup>IPv6 operations</workgroup>
+
+    <keyword>ipv6</keyword>
+
+    <keyword>slaac</keyword>
+
+    <keyword>464xlat</keyword>
+
+    <keyword>clat</keyword>
+
+    <keyword>nat64</keyword>
+
+    <keyword>pref64</keyword>
+
+    <keyword>ipv6-only</keyword>
+
+    <keyword>ipv6-mostly</keyword>
+
+    <abstract>
+      <t>464XLAT defines an architecture for providing IPv4 connectivity
+      across an IPv6-only network. The solution involves two functional
+      elements: a provider-side translator (PLAT) and a customer-side
+      translator (CLAT). This document updates the 464XLAT specification
+      (RFC6877) and Requirements for IPv6 Customer Edge Routers (RFC8585) by
+      further defining CLAT node behavior and IPv6 Customer Edge Routers to
+      support IPv4-as-a-Service by providing recommendations for node
+      developers on enabling and disabling CLAT.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section>
+      <name>Introduction</name>
+
+      <t>464XLAT is widely deployed in 3GPP networks (as described in Section
+      4.2 of <xref target="RFC6877" />) where User Equipment (UE) such as
+      mobile phones and customer equipment (CE) routers perform the
+      customer-side translation (CLAT) function, providing an IPv4 address and
+      default route for applications and tethered devices. Enabling 464XLAT
+      allowed mobile operators to transition UE to IPv6-only mode, where UE
+      cellular interfaces have only IPv6 addresses, and no forwardable IPv4
+      addresses.</t>
+
+      <t>IPv6-only hosts used to be rather uncommon outside of mobile networks
+      and datacenters. Even if a network offers provider-side translator
+      (PLAT) functionality in the form of NAT64 <xref target="RFC6146" />,
+      hosts (desktops, laptops, etc.) still needed the network to provide IPv4
+      connectivity, as otherwise applications which require IPv4 would fail.
+      However, as more and more operating systems outside of the 3GPP world
+      support CLAT, it becomes possible to migrate those devices to IPv6-only
+      mode, while still providing IPv4-as-a-Service via 464XLAT. Networks such
+      as public Wi-Fi, enterprise networks, or even home networks can deploy
+      464XLAT as described in Section 4.2 of <xref target="RFC6877" />:</t>
+
+      <ul>
+        <li>
+          <t>PLAT functions are performed by NAT64.</t>
+        </li>
+
+        <li>
+          <t>CLAT functions are performed by the host itself.</t>
+        </li>
+      </ul>
+
+      <t>In another variation of the 464XLAT deployment (Section 4.1 of <xref
+      target="RFC6877" />) a CE router is connected to an IPv6-only network
+      and provides CLAT functions for IPv4-enabled downstream devices. <xref
+      target="RFC8585" /> specifies 464XLAT support requirements for such
+      devices.</t>
+
+      <t>While Section 6 of <xref target="RFC6877" /> discusses implementation
+      considerations for the 464XLAT architecture, there is a need for more
+      detailed guidance for CLAT implementations. The increase in IPv6-only
+      deployments has provided valuable operational experience, which has
+      revealed gaps in existing CLAT requirements. This document addresses
+      these gaps by specifying normative behavior and providing
+      recommendations for implementing CLAT functions. For example, it
+      provides guidance on how CLAT nodes (such as a host or a CE router)
+      should enable CLAT when connecting to an IPv6-only network and how they
+      should react to network changes to minimize negative impact on user
+      traffic. This document complements and updates <xref target="RFC6877" />
+      and <xref target="RFC8585" />.</t>
+    </section>
+
+    <section>
+      <name>Requirements Language</name>
+
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+      "OPTIONAL" in this document are to be interpreted as described in BCP 14
+      <xref target="RFC2119" /> <xref target="RFC8174" /> when, and only when,
+      they appear in all capitals, as shown here.</t>
+    </section>
+
+    <section anchor="term">
+      <name>Terminology</name>
+
+      <t>This document reuses most of the terminology from Section 2 of <xref
+      target="RFC6877" /> and additionally defines the following terms:</t>
+
+      <ul>
+        <li>
+          <t>CLAT Node: a node (a host or a router) that performs CLAT
+          functions by running one or multiple CLAT instances (e.g., one CLAT
+          instance per interface). "CLAT" is also used in this document to
+          describe the functionality provided by a CLAT Node as a commonly
+          understood shorthand.</t>
+        </li>
+
+        <li>
+          <t>IPv4-only application: An application that requires the presence
+          of an IPv4 address and/or IPv4 default route to operate. Examples
+          include, but are not limited to, applications using IPv4 address
+          literals or opening IPv4-only sockets.</t>
+        </li>
+
+        <li>
+          <t>IPv6-only network: A network that does not assign IPv4 addresses
+          to hosts and facilitates connectivity to IPv4-only destinations
+          using NAT64 <xref target="RFC6146" /> as it is required by the
+          464XLAT architecture <xref target="RFC6877" />.</t>
+        </li>
+
+        <li>
+          <t>Native IPv4 (such as in 'native IPv4 connectivity' or 'native
+          IPv4 default gateway'): IPv4 connectivity provided by the network
+          without using any form of IPv4-as-a-Service or IP address family
+          translation mechanisms (such as 464XLAT).</t>
+        </li>
+
+        <li>
+          <t>ULA: Unique Local Addresses <xref target="RFC4193" />.</t>
+        </li>
+      </ul>
+    </section>
+
+    <section anchor="enable">
+      <name>Enabling CLAT</name>
+
+      <t>For performance and security reasons CLAT SHOULD NOT be enabled
+      (unless explicitly configured otherwise) for an interface if the node
+      has native IPv4 connectivity over that interface (see <xref
+      target="disable" /> for more details). Therefore, recommendations
+      provided in this section are only applicable to the IPv6-only interfaces
+      of a given node (the node has no native IPv4 connectivity via that
+      interface).</t>
+
+      <t>To enable CLAT, an IPv6-only node needs to discover the PLAT-side
+      translation IPv6 prefix, also known as the NAT64 prefix (see Section 6.3
+      of <xref target="RFC6877" />). For example, the PREF64 Router
+      Advertisement (RA) option <xref target="RFC8781" /> provides that
+      information and can be used as a strong indication that the network
+      supports PLAT (NAT64) functionality. In some cases, a node might
+      configure its IPv6 stack without receiving an RA (for example, via HTTP
+      Capsules, see <xref target="I-D.ietf-masque-connect-ip-dns" />).
+      Therefore an IPv6-only node SHOULD enable CLAT as soon as it receives a
+      PREF64 option from the network.</t>
+
+      <t>Discussion: this document does not require that a node MUST enable
+      CLAT upon receiving an RA because enabling CLAT by default may be
+      undesirable in certain scenarios. First, in a controlled deployment
+      environment, an administrator might explicitly prefer that the node not
+      have CLAT enabled. Second, CLAT is an IPv6 transition technology whose
+      operational utility will diminish as IPv4 dependencies become less
+      common. Even where CLAT is supported, default enablement may eventually
+      become unnecessary.</t>
+
+      <t>A node may have multiple IPv6-only interfaces (for example, a mobile
+      phone can be connected to an IPv6-only Wi-Fi network and to an IPv6-only
+      mobile network). The node MAY choose to enable CLAT on a subset of its
+      interfaces connected to networks equipped with PLAT. In that case the
+      node MUST run an independent, dedicated CLAT instance on each interface
+      the node chooses to enable CLAT on. Consequently, each CLAT instance
+      MUST install a separate default IPv4 route on each CLAT-enabled
+      interface.</t>
+
+      <t>If the node does not receive a PREF64 from the network, the node MAY
+      use other mechanisms to detect the PLAT presence and obtain the NAT64
+      prefix (such as <xref target="RFC7050" />). Section 3.1 of <xref
+      target="RFC9872" /> discusses this approach in more detail. When
+      discovering the NAT64 prefix using the mechanism defined in <xref
+      target="RFC7050" />, the node MUST follow recommendations provided in
+      <xref target="RFC8880" />. Specifically, the node MUST send the query to
+      the DNS servers for the specific network interface per Section 7.1 of
+      <xref target="RFC8880" />. In particular, queries for AAAA resource
+      records of "ipv4only.arpa." MUST be sent to the DNS resolvers provided
+      through the specific network interface, not to any resolvers configured
+      manually or otherwise.</t>
+
+      <t>Any delay in enabling CLAT on an IPv6-only node would be impactful
+      for IPv4-only applications, as such applications cannot benefit from
+      464XLAT until CLAT is operational. Therefore it is desirable that the
+      node enables CLAT as soon as network support for PLAT is detected while
+      native IPv4 connectivity is not yet detected. Unless configured
+      otherwise, the node MUST enable CLAT if the node has not already
+      obtained a non-link-local IPv4 address by the time it discovers the
+      NAT64 prefix. The node SHOULD NOT wait for an explicit (DHCP Option 108)
+      or an implicit (DHCP timeouts) indication that native IPv4 connectivity
+      is not available. However, to mitigate attacks described in Section 7 of
+      <xref target="RFC7050" /> the node MAY delay enabling CLAT if the NAT64
+      prefix was discovered via DNS <xref target="RFC7050" /> only. Such a
+      delay minimizes the chance of temporary control of traffic by an
+      attacker at the expense of delayed IPv4 connectivity through CLAT. The
+      length of this optional delay is implementation specific and might, for
+      example, be calculated heuristically based on previous observations for
+      the given network attachment. Nodes implementing this delay MAY provide
+      a configuration option to disable the delay. If native IPv4 connectivity
+      becomes available later for a given interface, the node MUST disable
+      CLAT for that interface (unless explicitly configured to keep it
+      running) as discussed in the following section.</t>
+
+      <t>If the node supports multiple IPv4 continuity solutions, the node
+      MUST follow recommendations from Section 4 of <xref target="RFC7335" />
+      to avoid IPv4 address space conflicts.</t>
+    </section>
+
+    <section anchor="disable">
+      <name>Disabling CLAT</name>
+
+      <t>It is possible that after a CLAT instance has started, native IPv4
+      connectivity becomes available (e.g., an IPv4 address received via
+      DHCP). If the node is not explicitly configured to prefer CLAT over
+      native IPv4 by an administrator, the node MUST disable the CLAT instance
+      immediately upon obtaining a native IPv4 default gateway on the
+      interface served by that instance.</t>
+
+      <t>Disabling CLAT when native IPv4 connectivity is available can be
+      impactful for all applications and traffic flows already utilizing CLAT.
+      However, disabling CLAT is recommended not only from a performance
+      perspective, but also from a security point of view. <xref
+      target="Security" /> discusses this aspect in more details.</t>
+
+      <t>Native IPv4 connectivity, which subsequently causes CLAT to be
+      disabled, might not be intended by the administrator. It could instead
+      be the result of a network misconfiguration (such as accidentally
+      enabling IPv4) or an attack (such as a rogue DHCPv4 server). In such
+      cases it might be useful for an administrator to receive signals when
+      CLAT turns on or off as well as changes to network-received
+      configuration. Therefore the node SHOULD support logging the reason for
+      disabling CLAT and any other changes to CLAT configuration or network
+      signals CLAT is acting on to support administrator debugging and
+      auditing. As logging is mostly beneficial in managed environments, the
+      logging behaviour SHOULD be configurable. The logging SHOULD be disabled
+      by default to avoid performance impacts when the likelihood of anyone
+      consuming the logs is low.</t>
+
+      <t>There are some corner cases when an administrator might prefer the
+      node to use CLAT even if native IPv4 connectivity is available (e.g.,
+      for performance reasons, if IPv4-as-a-Service performs better than
+      native IPv4). This behaviour might be desirable for devices which do not
+      move between networks, such as servers or workstations, where the
+      administrator might want to have CLAT enabled unconditionally. However
+      for the reasons described above such behaviour MUST be explicitly
+      enabled by the administrator via configuration and MUST NOT be a default
+      behaviour, especially for unmanaged nodes.</t>
+    </section>
+
+    <section anchor="addr">
+      <name>CLAT Addresses Considerations</name>
+
+      <section anchor="v4addr">
+        <name>CLAT IPv4 Addresses</name>
+
+        <t>A CLAT instance provides an IPv4 address and the default IPv4 route
+        to the local node's network stack. However, the node can also extend
+        the network downstream and provides IPv4 network connectivity to other
+        connected systems (e.g., tethering). Those systems can be physical
+        (e.g., various clients connected to a CE router), or logical (e.g.,
+        virtual systems running on a node, while the host system acts as a
+        router and performs CLAT). In all those cases, systems behind a CLAT
+        node usually use <xref target="RFC1918" /> addresses. A CLAT instance
+        can either translate these IPv4 addresses statelessly into IPv6
+        addresses using a dedicated IPv6 prefix per <xref target="RFC6052" />,
+        or perform a stateful NAT44 between these IPv4 addresses and a
+        dedicated CLAT IPv4 address, which is then statelessly translated to a
+        single dedicated IPv6 address. In both cases, even with stateful
+        NAT44, translation between IPv4 and IPv6 is stateless.</t>
+
+        <t>This section only applies to a single dedicated IPv4 address which
+        a CLAT instance uses for providing network connectivity only to local
+        applications or using stateful NAT44 when extending network
+        connectivity downstream.</t>
+
+        <t>A CLAT instance needs a single IPv4 CLAT address and a single
+        CLAT-only IPv6 address (which is distinct from the one or more IPv6
+        addresses used by the node running CLAT for its own native IPv6
+        connectivity, see <xref target="slaac" />). A node providing CLAT
+        functions to local applications SHOULD use IPv4 addresses from the
+        dedicated 192.0.0.0/29 range <xref target="RFC7335" /> because it is
+        reserved for IPv4 continuity solutions including but not limited to
+        464XLAT. Use of other source IP addresses is technically possible but
+        might result in incorrect assumptions made by other processes relying
+        on the presence of a source IPv4 address with a 192.0.0.0/29 prefix to
+        determine if an IPv4 continuity solution is being used. If the node
+        runs multiple CLAT instances, the node SHOULD use different local IPv4
+        addresses for each CLAT instance. This approach limits the number of
+        CLAT instances per node to 8, which seems to be more than sufficient
+        for typical configurations at the time of this writing. If in the
+        future some deployment scenarios require more than 8 CLAT instances
+        per node, a new IPv4 range will be requested from IANA.</t>
+
+        <t>The node MUST NOT send packets to the network from the local CLAT
+        addresses.</t>
+
+        <t>The node SHOULD use 255.255.255.255 as a netmask for the CLAT
+        address. That allows all 8 addresses from 192.0.0.0/29 to be used, if
+        needed, since this means that each address is treated as being its own
+        subnet, rather than being part of a subnet delineated by the
+        prefix.</t>
+
+        <t>It should be noted that 192.0.0.0/29 is shared between multiple
+        IPv4 continuity solutions such as 464XLAT and DS-Lite (see <xref
+        target="RFC7335" />). For example, Section 10 of <xref
+        target="RFC6333" /> reserves 192.0.0.1 for the Dual-Stack Lite default
+        router. However, as per Section 4 of <xref target="RFC7335" />, the
+        node "MUST NOT enable two active IPv4 continuity solutions
+        simultaneously in a way that would cause a node to have overlapping
+        192.0.0.0/29 address space" <xref target="RFC7335" />. Therefore, as
+        long as the node is not using DS-Lite, it can use 192.0.0.0/29 for
+        CLAT.</t>
+      </section>
+
+      <section anchor="v6addr">
+        <name>CLAT IPv6 Addresses</name>
+
+        <section anchor="slaac">
+          <name>Obtaining CLAT IPv6 Addresses</name>
+
+          <t>Section 6.3 of <xref target="RFC6877" /> recommends that a CLAT
+          instance acquires a dedicated /64 for translating between IPv4 and
+          IPv6, and only uses a single interface IPv6 address if a dedicated
+          prefix is not available via DHCPv6-PD <xref target="RFC9915" />.
+          However, deployments where each node can obtain a dedicated /64 just
+          for CLAT are rather uncommon, especially in environments such as
+          enterprise networks and Wi-Fi hotspots. Quite often the CLAT
+          instance uses a single IPv6 address as a source for all IPv4 traffic
+          translated by CLAT. In particular, if the CLAT only provides the
+          IPv4 connectivity to applications local to the node (or if the node
+          chooses to perform stateful NAT44) the CLAT instance only needs a
+          single CLAT IPv6 address, so obtaining a /64 is wasteful. For
+          instance, a home network that gets a /60 from its ISP can only
+          connect up to 15 CLAT devices before it runs out of available
+          prefixes. Even if the node extends IPv4 connectivity downstream, the
+          CLAT instance can first perform stateful NAT44 to translate all IPv4
+          addresses used by downstream devices to a single IPv4 address, and
+          then perform stateless CLAT.</t>
+
+          <t>This document updates <xref target="RFC6877" /> by relaxing the
+          requirement to acquire a dedicated /64 prefix for the purpose of
+          sending and receiving statelessly translated packets. The following
+          recommendations are made instead:</t>
+
+          <ul>
+            <li>
+              <t>If the node is extending IPv4 connectivity downstream, the
+              node MUST either:</t>
+
+              <ul>
+                <li>
+                  <t>Obtain a dedicated prefix that satisfies the requirements
+                  in section 2.2 of <xref target="RFC6052" /> (e.g., via
+                  DHCPv6-PD), and statelessly translate downstream IPv4
+                  addresses to IPv6 addresses in this prefix.</t>
+                </li>
+
+                <li>
+                  <t>Perform stateful NAT44 from the downstream IPv4 addresses
+                  to a single IPv4 address and then perform stateless
+                  translation of that single IPv4 address to a single
+                  dedicated IPv6 address.</t>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <t>If the CLAT instance only uses a single IPv4 address
+              (including scenarios where the node is performing stateful NAT44
+              to that address), the instance SHOULD NOT obtain a dedicated
+              prefix for the purpose of sending and receiving statelessly
+              translated packets.</t>
+            </li>
+          </ul>
+
+          <t>If the CLAT instance does not obtain a dedicated IPv6 prefix, the
+          instance MUST obtain a dedicated IPv6 address used exclusively for
+          CLAT functions. A dedicated address is needed because applications
+          running on a CLAT node can use an IPv4 socket and an IPv6 socket to
+          produce an IPv4 packet and an IPv6 packet that after translation are
+          identical, and the CLAT has no way to know whether to translate
+          those replies and pass them back to the IPv4 socket or pass them
+          back to the IPv6 socket as is. For example, these two packets sent
+          by the node will be identical after translation:</t>
+
+          <ul>
+            <li>
+              <t>An IPv4 UDP packet from 192.0.0.4:12345 to 203.0.113.8:53</t>
+            </li>
+
+            <li>
+              <t>An IPv6 UDP packet from the CLAT IPv6 address, port 12345 to
+              [64:ff9b::203.0.113.8]:53</t>
+            </li>
+          </ul>
+
+          <t>Similarly, responses (such as ICMP errors) to IPv4 and IPv6
+          packets may be identical when they arrive at the CLAT for
+          translation back to IPv4. For example:</t>
+
+          <ul>
+            <li>
+              <t>An ICMPv6 Echo Reply packet from 64:ff9b::203.0.113.1 can be
+              a response to either an IPv6 ICMP Echo Request to
+              64:ff9b::203.0.113.1, or an IPv4 ping to 203.0.113.1, translated
+              by a CLAT instance.</t>
+            </li>
+
+            <li>
+              <t>An ICMPv6 error packet from a global IPv6 address (not
+              belonging to the NAT64 prefix) might be a response to either
+              native IPv6 traffic from the host, or CLAT traffic (see <xref
+              target="I-D.ietf-v6ops-icmpext-xlat-v6only-source" /> for more
+              details).</t>
+            </li>
+          </ul>
+
+          <t>Therefore, in the absence of dedicated IPv6 addresses, the
+          architecture would need additional stateful elements on the client
+          side which are not part of 464XLAT as defined in <xref
+          target="RFC6877" />. Discussion of such architectures is beyond the
+          scope of this document.</t>
+
+          <t>If the dedicated CLAT address is obtained via Stateless Address
+          Autoconfiguration (SLAAC, <xref target="RFC4862" />), the CLAT
+          instance SHOULD choose the interface ID in such a way that the
+          resulting CLAT IPv6 address is checksum-neutral. This means the CLAT
+          IPv6 address has the same complement checksum as the local CLAT IPv4
+          address. See Section 4.1 of <xref target="RFC6052" />. This means
+          that the local IPv4 address needs to be assigned/known before the
+          IPv6 address is configured. Using a checksum-neutral CLAT address
+          provides the following benefits:</t>
+
+          <ul>
+            <li>
+              <t>Better performance as CLAT doesn't need to recalculate the
+              checksum.</t>
+            </li>
+
+            <li>
+              <t>If a protocol uses the standard Internet checksum <xref
+              target="RFC1071" />, CLAT doesn't need to recalculate the
+              checksum. That improves the chances of the protocol working via
+              CLAT even if CLAT is not aware of the protocol's semantics.</t>
+            </li>
+          </ul>
+
+          <t>To protect user privacy and prevent user tracking through CLAT
+          addresses, the node SHOULD generate a different interface identifier
+          for the CLAT address when connecting to different networks, even if
+          the NAT64 prefix and the local IPv4 CLAT address do not change. In
+          particular, the node SHOULD generate a random CLAT address every
+          time the network attachment changes to another network.</t>
+        </section>
+
+        <section>
+          <name>CLAT vs non-CLAT IPv6 Addresses Behaviour</name>
+
+          <t>Reports from the field indicate that some CLAT implementations
+          exhibit different behavior for their CLAT IPv6 addresses compared to
+          native IPv6 addresses. While this approach may simplify
+          implementation, it often leads to a degraded user experience, as
+          described below. Therefore the node MUST treat its CLAT IPv6
+          addresses as any other IPv6 address and comply with <xref
+          target="RFC4861" /> and <xref target="RFC4862" />. In
+          particular:</t>
+
+          <ul>
+            <li>
+              <t>The node MUST perform Duplicate Address Detection (DAD) for
+              each dedicated CLAT address (Section 5.4 of <xref
+              target="RFC4862" />).</t>
+
+              <ul>
+                <li>
+                  <t>Justification: performing DAD minimizes loss of
+                  connectivity in the unlikely event of address collision.
+                  Additionally, real world deployment experience shows that
+                  network infrastructure devices mandate a DAD packet from the
+                  client before enabling network access.</t>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <t>The node MUST process unicast and multicast Neighbor
+              Solicitations (NSes) for the node's CLAT addresses the same way
+              the node would process NSes for a non-CLAT address. This is to
+              avoid unexpected packet loss for applications.</t>
+
+              <ul>
+                <li>
+                  <t>Justification: A simple example is if a node doesn't
+                  respond to unicast NSes, anytime the first-hop router gets a
+                  packet for the CLAT address and its Neighbor Cache entry is
+                  'STALE' (Section 7.3.2 of <xref target="RFC4861" />), the
+                  Neighbor Unreachability Detection process (Section 7.3.3 of
+                  <xref target="RFC4861" />) will delete that CLAT address's
+                  cache entry. This forces the address resolution process to
+                  restart from scratch. Until resolution finishes, traffic for
+                  the CLAT address might drop, leading to a degraded user
+                  experience, especially for applications sensitive to jitter
+                  and packet loss.</t>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <t>If the node supports Gratuitous Neighbor Advertisements <xref
+              target="RFC9131" />, the node SHOULD send them for the CLAT
+              addresses.</t>
+
+              <ul>
+                <li>
+                  <t>Justification: not following this recommendation leads to
+                  user-visible packet loss when the CLAT instance starts
+                  receiving traffic after a period of inactivity, or when
+                  connected to the network for the first time. The problem is
+                  discussed in Section 2 of <xref target="RFC9131" />.</t>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <t>The node that has the address registration using DHCPv6 <xref
+              target="RFC9686" /> enabled MUST register the CLAT addresses the
+              same way as non-CLAT addresses, if the network supports the
+              registration.</t>
+
+              <ul>
+                <li>
+                  <t>Justification: not registering CLAT addresses reduces
+                  traffic visibility for network operators, which complicates
+                  troubleshooting and forensics, as discussed in <xref
+                  target="RFC9686" />.</t>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+      </section>
+    </section>
+
+    <section anchor="mhoming">
+      <name>CLAT and Multiple Prefixes per Interface</name>
+
+      <t>IPv6 multihoming, particularly when multiple routers on the same link
+      advertise different prefixes in Prefix Information Options (PIOs),
+      presents a complex and not yet fully resolved challenge.</t>
+
+      <t>When routers on a given link are managed independently (e.g., by
+      different ISPs), the resulting set of configuration parameters received
+      by a host can be difficult to utilize without creating a complex and
+      fragile state machine. For example, if router_A advertises a PIO with
+      prefix_A and PREF64_A, while router_B advertises a PIO with prefix_B and
+      PREF64_B, it is crucial that the CLAT bundles the information received
+      from each router. A CLAT instance must use PREF64_A and generate a CLAT
+      address from prefix_A, sending translated packets to router_A.
+      Alternatively, it must use PREF64_B, generate an address from prefix_B,
+      and send translated packets to router_B. Mixing configuration
+      information from different routers (e.g., generating a CLAT address from
+      prefix_A but using PREF64_B for translation) can lead to packet loss.
+      For example, if packets with source addresses from prefix_A are sent to
+      router_B, that router (or the uplink network) might drop the packets
+      according to BCP 38 <xref target="RFC2827" />. Similarly, if the CLAT
+      instance uses PREF64_A, advertised by router_A, but those packets are
+      sent to router_B, that router might not be configured to translate
+      packets for that prefix.</t>
+
+      <t>The Provisioning Domain (PvD) architecture <xref target="RFC7556" />
+      provides a mechanism for a PvD-aware node to operate correctly in such
+      scenarios (see <xref target="RFC8801" />). However, at the time of
+      writing PvD support is uncommon for host operating systems, and PvD
+      support is not widely deployed by network operators. Therefore this
+      document focuses on scenarios when the node is not PvD-aware.</t>
+
+      <t>This document does not aim to define CLAT behavior for every possible
+      multi-router/multi-prefix scenario. Instead, this section provides
+      recommendations for common scenarios, leaving numerous corner cases out
+      of scope.</t>
+
+      <t>This section assumes that a router is identified by its link-local
+      address, used as a source address for RAs. For example, "detecting
+      multiple routers" means that the node received RAs from multiple
+      link-local addresses.</t>
+
+      <t>A node discovering multiple routers on the same interface advertising
+      the <em>same PIOs and NAT64 prefix</em>, SHOULD only create one CLAT
+      instance using one of the PIOs to form a CLAT address.</t>
+
+      <t>A node can discover multiple routers on the same interface signalling
+      <em>different PIOs and NAT64 prefixes</em>. In that case, the node MAY
+      create one CLAT instance for each tuple of PIO and NAT64 prefix (both
+      PIO and NAT64 prefix in a given tuple MUST be advertised by the same
+      router). Alternatively, the node MAY create only a single CLAT instance
+      using the NAT64 prefix discovered through the selected IPv6 default
+      router and the address formed from a PIO advertised by that router.</t>
+
+      <t>When a node creates a single CLAT instance and must choose between
+      multiple PIOs, the node SHOULD select a single PIO using the same
+      algorithm as for choosing the source address for a destination within
+      the selected NAT64 prefix (<xref target="RFC6724" />, updated by <xref
+      target="I-D.ietf-6man-rfc6724-update" />).</t>
+
+      <t>Discussion: This approach, leveraging the default source address
+      selection algorithm (Section 5 of <xref target="RFC6724" />), typically
+      results in the policy table (rule 6) and longest prefix match (rule 8)
+      being used for prefix selection. This ensures CLAT address selection
+      aligns with default source address selection for native IPv6 flows,
+      offering the following advantages:</t>
+
+      <ul>
+        <li>
+          <t>When using the well-known NAT64 prefix (64:ff9b::/96), non-ULA
+          prefixes are preferred over ULA prefixes by default. This is
+          beneficial as ULA source packets may not reach PLAT devices.</t>
+        </li>
+
+        <li>
+          <t>For network-specific NAT64 prefixes within the known-local ULA
+          range (<xref target="I-D.ietf-6man-rfc6724-update" />), the ULA
+          prefix is preferred. This can be advantageous in home and enterprise
+          environments where administrators intend to perform NAT64 for
+          specific source prefixes only.</t>
+        </li>
+
+        <li>
+          <t>For network-specific NAT64 prefixes within the operator's global
+          non-ULA range, the longest prefix match selects the PIO, ensuring
+          CLAT uses the operator's source address for traffic to the
+          operator's PLAT in multi-prefix environments.</t>
+        </li>
+
+        <li>
+          <t>In managed environments, operators can customize CLAT behavior by
+          modifying the policy table if the default prefix selection is
+          unsuitable.</t>
+        </li>
+      </ul>
+
+      <t>Creating a single CLAT instance significantly simplifies the CLAT
+      state machine. However, this approach may concentrate all traffic from
+      that instance onto the same first-hop router and NAT64 device in some
+      multihomed topologies. As traffic shifts from CLAT to native IPv6, this
+      drawback becomes less significant and does not justify the added
+      complexity of multiple instances.</t>
+
+      <section anchor="renumb">
+        <name>Link Renumbering</name>
+
+        <t>As discussed above, a single CLAT instance per interface, using a
+        single PIO, is typically sufficient, even if the link has multiple
+        assigned subnets. However, PIO selection can significantly impact user
+        experience during link renumbering.</t>
+
+        <t><xref target="RFC8978" /> discusses various examples of "flash
+        renumbering", where the IPv6 prefix assigned to the link changes
+        without explicit host notification. <xref
+        target="I-D.ietf-6man-slaac-renum" /> and <xref
+        target="I-D.link-6man-gulla" /> discuss methods to mitigate the impact
+        of flash renumbering. These methods generally rely on hosts with
+        addresses from both old and new prefixes ceasing use of the old prefix
+        and adopting the new prefix. For nodes running CLAT instances, this
+        requires disabling instances using addresses from the old prefix and
+        creating an instance using an address from the new prefix.</t>
+
+        <t>The CLAT node SHOULD use at least the following signals to detect
+        link renumbering events:</t>
+
+        <ul>
+          <li>
+            <t>A prefix used to form the CLAT address becomes deprecated or
+            invalid (<xref target="RFC4862" />).</t>
+          </li>
+
+          <li>
+            <t>The router (or routers) advertising the PIO used to form the
+            CLAT address</t>
+
+            <ul>
+              <li>
+                <t>has changed its state from being reachable or probably
+                reachable to being unknown or suspect (i.e., its neighbor
+                cache entry moved to the 'INCOMPLETE' state or ceased to
+                exist, see Section 6.3.6 of <xref target="RFC4861" />).</t>
+              </li>
+
+              <li>
+                <t>ceased to be a router (see Section 7.3.3 of <xref
+                target="RFC4861" />).</t>
+              </li>
+            </ul>
+          </li>
+        </ul>
+
+        <t>Upon receiving a signal indicating a possible renumbering event,
+        the node SHOULD disable the CLAT instance(s) affected by the
+        renumbering, and create new instance(s). In case of implicit signals
+        (provided by the Neighbor Unreachability Detection, <xref
+        target="RFC4861" />, rather than by a Router Advertisement deprecating
+        or invalidating a prefix), the node MAY send Router Solicitations to
+        obtain the most up-to-date network configuration information. When
+        sending Router Solicitations the node MUST follow recommendations
+        specified in Section 6.3.7 of <xref target="RFC4861" />. The node MAY
+        react to a potential renumbering event in a "make-before-break"
+        manner, when old instances are still running until all required
+        information to enable new ones becomes available.</t>
+      </section>
+    </section>
+
+    <section>
+      <name>MTU Considerations</name>
+
+      <t>The IPv4 header is 20 bytes long (or longer if IP options are
+      present), while the IPv6 header is 40 bytes. This means that when CLAT
+      translates an IPv4 packet to IPv6, it usually adds 20 bytes to the
+      packet size. However, when CLAT translates a fragmented IPv4 packet,
+      then Fragment Header needs to be added to the resulting IPv6 packet
+      (Section 4.1 of <xref target="RFC7915" />). The length of IPv6 Fragment
+      Extension header is 8 bytes (Section 4.5 of <xref target="RFC8200" />).
+      Therefore, the CLAT instance SHOULD present IPv4-only applications with
+      an IPv4 MTU which is 28 bytes smaller than the IPv6 MTU of the interface
+      the instance is running on because anything higher risks undesirable IP
+      fragmentation (<xref target="RFC8900" />) and anything lower artifically
+      restricts packet sizes for no benefit.</t>
+    </section>
+
+    <section anchor="update">
+      <name>Updates to Existing RFCs</name>
+
+      <section anchor="update6877">
+        <name>Updates to RFC6877</name>
+
+        <t>This document updates Section 6.3 of <xref target="RFC6877" /> by
+        relaxing the requirement to acquire a dedicated /64 prefix for the
+        purpose of sending and receiving statelessly translated packets. More
+        details on the recommended node behaviour can be found in <xref
+        target="slaac" />.</t>
+      </section>
+
+      <section anchor="update8585">
+        <name>Updates to RFC8585</name>
+
+        <t>This document makes the following changes to Section 3.2.1 of <xref
+        target="RFC8585" />:</t>
+
+        <t>OLD TEXT:</t>
+
+        <t>===</t>
+
+        <t>464XLAT requirements:</t>
+
+        <t>===</t>
+
+        <t>NEW TEXT:</t>
+
+        <t>===</t>
+
+        <t>464XLAT requirements:</t>
+
+        <t>464XLAT-0: The IPv6 Transition CE Router SHOULD follow
+        recommendations provided in THIS DOCUMENT (note to the RFC Editor to
+        add a reference to this document's RFC number).</t>
+
+        <t>===</t>
+
+        <t>OLD TEXT:</t>
+
+        <t>===</t>
+
+        <t>464XLAT-4: The IPv6 Transition CE Router MUST implement <xref
+        target="RFC7050" /> ("Discovery of the IPv6 Prefix Used for IPv6
+        Address Synthesis") in order to discover the provider-side translator
+        (PLAT) translation IPv4 and IPv6 prefix(es)/suffix(es).</t>
+
+        <t>===</t>
+
+        <t>NEW TEXT:</t>
+
+        <t>===</t>
+
+        <t>464XLAT-4: The IPv6 Transition CE Router MUST implement <xref
+        target="RFC8781" /> ("Discovering PREF64 in Router Advertisements")
+        and SHOULD implement <xref target="RFC7050" /> ("Discovery of the IPv6
+        Prefix Used for IPv6 Address Synthesis") in order to discover the
+        provider-side translator (PLAT) translation IPv4 and IPv6
+        prefix(es)/suffix(es).</t>
+
+        <t>===</t>
+
+        <t>OLD TEXT:</t>
+
+        <t>===</t>
+
+        <t>464XLAT-6: If the network provides several choices for the
+        discovery/learning of the NAT64 prefix, the priority to use one or the
+        other MUST follow this order: 1) <xref target="RFC7225" /> and 2)
+        <xref target="RFC7050" />.</t>
+
+        <t>The NAT64 prefix could be discovered by means of the method defined
+        in <xref target="RFC7050" /> only if the service provider uses DNS64
+        <xref target="RFC6147" />. It may be the case that the service
+        provider does not use or does not trust DNS64 <xref
+        target="RFC6147" /> because the DNS configuration at the CE (or hosts
+        behind the CE) can be modified by the customer. In that case, the
+        service provider may opt to configure the NAT64 prefix by means of the
+        option defined in <xref target="RFC7225" />. This can also be used if
+        the service provider uses DNS64 <xref target="RFC6147" />.</t>
+
+        <t>===</t>
+
+        <t>NEW TEXT</t>
+
+        <t>===</t>
+
+        <t>464XLAT-6: If the network provides several choices for the
+        discovery/learning of the NAT64 prefix, the priority to use one or the
+        other MUST follow this order: 1)<xref target="RFC7225" /> 2)<xref
+        target="RFC8781" /> and 3)<xref target="RFC7050" />.</t>
+
+        <t>464XLAT-7: If the IPv6 Transition CE Router performs CLAT functions
+        it SHOULD also include the PREF64 option containing the PLAT prefix in
+        Router Advertisements (<xref target="RFC8781" />) sent via the LAN
+        interfaces. If the IPv6 Transition CE Router acts as a DHCP server it
+        SHOULD enable DHCP Option 108 (<xref target="RFC8925" />) processing.
+        The router SHOULD have a configuration knob to disable DHCP Option 108
+        processing.</t>
+
+        <t><xref target="RFC8781" /> allows the service provider to signal
+        NAT64 prefix independently from DNS64 presence. At the same time the
+        NAT64 prefix could be discovered by means of the method defined in
+        <xref target="RFC7050" /> only if the service provider uses DNS64
+        <xref target="RFC6147" />. It may be the case that the service
+        provider does not use or does not trust DNS64 <xref
+        target="RFC6147" /> because the DNS configuration at the CE (or hosts
+        behind the CE) can be modified by the customer. In that case, the
+        service provider may opt to configure the NAT64 prefix by means of the
+        option defined in <xref target="RFC7225" />. This can also be used if
+        the service provider uses DNS64 <xref target="RFC6147" />.</t>
+
+        <t>===</t>
+      </section>
+    </section>
+
+    <section anchor="ops">
+      <name>Operational Considerations</name>
+
+      <t>There are no new operations or manageability requirements for mobile
+      networks introduced by this document. For non-mobile environments, such
+      as datacenters, public Wi-Fi, or enterprise networks, the operational
+      considerations are documented in <xref
+      target="I-D.ietf-v6ops-6mops" />.</t>
+    </section>
+
+    <section anchor="Security">
+      <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
+
+      <name>Security Considerations</name>
+
+      <t>If a malicious actor spoofs PLAT presence signals (such as an RA with
+      PREF64 option) or DNS responses for DNS-based NAT64 prefix detection
+      <xref target="RFC7050" />, traffic of IPv4-only applications using CLAT
+      can be affected:</t>
+
+      <ul>
+        <li>
+          <t>If there are no PLAT (NAT64) devices, traffic to NAT64
+          destinations would be dropped.</t>
+        </li>
+
+        <li>
+          <t>If the attacker intercepts traffic for the NAT64 prefix (e.g., by
+          providing the victim with a bogus NAT64 prefix and steering traffic
+          for those destinations towards themselves), the attacker might be
+          able to perform man-in-the-middle attacks (active attack on insecure
+          traffic or hoarding secure traffic for "Harvest Now, Decrypt Later"
+          attacks for non-PQC secure traffic, see Section 8 of <xref
+          target="I-D.ietf-pquip-pqc-engineers" />).</t>
+        </li>
+      </ul>
+
+      <t>Rogue RAs can also disturb traffic to destinations that support both
+      IPv4 and IPv6 by causing IPv6 through an attacker's PLAT to be used
+      instead of the legitimate network owner's IPv4 path.</t>
+
+      <t>Using the PREF64 RA option to detect PLAT presence and the NAT64
+      prefix is less prone to such attacks than DNS-based detection (<xref
+      target="RFC7050" />), as the attacker needs to be on-link and be able to
+      bypass layer-2 security features such as RA Guard (see Section 4 of
+      <xref target="RFC9872" /> for more details). Therefore <xref
+      target="enable" /> recommends the PREF64 RA option as a preferred way to
+      detect PLAT presence, in accordance with <xref target="RFC9872" />. If
+      DNS-based detection (<xref target="RFC7050" />) is necessary for other
+      deployment reasons, the risk of local attack can be reduced by using
+      encrypted DNS protocols and advertising the resolvers using RA options
+      (<xref target="RFC9463" />).</t>
+
+      <t>The attack vector described above is not specific to 464XLAT
+      deployments: security implications of rogue RAs have been discussed and
+      documented before (see <xref target="RFC6104" />). To prevent such an
+      attack, IPv6-enabled networks need to secure RAs, e.g., by deploying
+      RA-Guard <xref target="RFC6105" />. However, networks without explicit
+      (intentional) IPv6 deployment are inherently IPv6-ignorant, and
+      consequently might lack IPv6 security features. In such networks
+      IPv6-enabled endpoints may be inadvertently exposed to link-local IPv6
+      connectivity. This unintended exposure can facilitate PLAT presence
+      signal falsification, as described above. This document mitigates this
+      risk by recommending that endpoints disable CLAT when the network
+      provides non-link-local IPv4 connectivity, as outlined in <xref
+      target="disable" />.</t>
+
+      <t>However, the recommended behaviour (disabling CLAT in the presence of
+      native IPv4 connectivity) introduces another attack vector: a rogue
+      DHCPv4 server. An attacker can provide the CLAT node with an IPv4
+      address and default gateway, causing the node to disable CLAT. Similarly
+      to the spoofed PLAT presence case discussed above, a rogue DHCP server
+      allows the attacker to implement:</t>
+
+      <ul>
+        <li>
+          <t>A denial-of-service attack (as the victim's IPv4 traffic will be
+          dropped by the network).</t>
+        </li>
+
+        <li>
+          <t>A man-in-the-middle attack by acting as an IPv4 default gateway
+          for the victim node.</t>
+        </li>
+      </ul>
+
+      <t>It should be noted that such attacks are not specific to the CLAT
+      scenario, and can occur in IPv4-only or dual-stack networks as well.
+      Various well-known Layer 2 security techniques (such as DHCP snooping)
+      are available and considered a best practice in IPv4-enabled
+      deployments. To mitigate rogue DHCPv4 server attacks on CLAT nodes,
+      network administrators can deploy DHCPv4-related security features even
+      if the network is expected to operate in IPv6-only mode.</t>
+
+      <t>As discussed, disabling CLAT when native IPv4 connectivity is present
+      helps mitigate RA-based attacks but enables DHCPv4-based attack vectors
+      if the network lacks Layer 2 security features. The choice between
+      disabling CLAT when native IPv4 connectivity is present and keeping it
+      enabled is dictated by the threat model and risk assessment. At the time
+      of this document's publication, it is much more likely that an IPv4-only
+      network lacks IPv6 security than an IPv6-only network not having IPv4
+      Layer 2 security features deployed. Therefore, this document prescribes
+      that the node SHOULD disable CLAT if native IPv4 connectivity is
+      present. The choice of SHOULD, rather than MUST, is determined by
+      considerations of future compatibility: nodes operating in environments
+      where rogue RAs are no more likely than rogue DHCP servers might choose
+      to keep CLAT enabled, while still complying with this specification.</t>
+    </section>
+
+    <section anchor="privacy">
+      <name>Privacy Considerations</name>
+
+      <t>This document does not introduce any new privacy considerations, but
+      there are some existing privacy considerations not documented in <xref
+      target="RFC6877" />. In particular, if a CLAT instance utilizes the same
+      CLAT IPv6 address for an extensive period of time or, much worse, uses
+      the same interface ID for the CLAT address when connecting to different
+      networks, eavesdroppers and information collectors could potentially
+      correlate various network activity to the same node. To mitigate that
+      risk and make address-based network-activity correlation more difficult,
+      <xref target="slaac" /> recommends that the node SHOULD generate a
+      different interface identifier for the CLAT address when connecting to
+      different networks.</t>
+
+      <t>It should be noted that the node's CLAT IPv6 address is only used
+      (and visible to observers) when the traffic is carried from the CLAT
+      node to the PLAT. In the vast majority of the cases it means that
+      address is never visible outside of the network boundary, so to perform
+      address-based network-activity correlation the observer needs to be
+      located in the same network as the CLAT node, or the PLAT needs to
+      reside outside of the administrative domain, such as a public NAT64
+      service.</t>
+    </section>
+
+    <section anchor="IANA">
+      <!-- All drafts are required to have an IANA considerations section. See RFC 8126 for a guide.-->
+
+      <name>IANA Considerations</name>
+
+      <t>This memo does not introduce any requests to IANA.</t>
+    </section>
+
+    <!-- NOTE: The Acknowledgements and Contributors sections are at the end of this template -->
+  </middle>
+
+  <back>
+    <references>
+      <name>References</name>
+
+      <references>
+        <name>Normative References</name>
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2119.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4193.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4861.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4862.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6052.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6146.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6147.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6333.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6724.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6877.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7050.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7335.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7915.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8200.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8880.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8585.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8781.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8925.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9131.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9463.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9686.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9872.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9915.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-6man-rfc6724-update.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <!-- The recommended and simplest way to include a well known reference -->
+      </references>
+
+      <references>
+        <name>Informative References</name>
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.1071.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.1918.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2827.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6104.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6105.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7225.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7556.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8801.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8900.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8978.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-pquip-pqc-engineers.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-6man-slaac-renum.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-v6ops-icmpext-xlat-v6only-source.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-masque-connect-ip-dns.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-v6ops-6mops.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.link-6man-gulla.xml"
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />
+      </references>
+    </references>
+
+    <section anchor="Acknowledgements" numbered="false">
+      <name>Acknowledgements</name>
+
+      <t>Thanks to Mohamed Boucadair, Ondrej Caletka, Stuart Cheshire,
+      Menachem Dodge, Jeremy Duncan, Wesley Eddy, Goetz Goerisch, James Harr ,
+      Jason Healy, Ed Horley, KAWASHIMA Masanobu, Ted Lemon, Nicolai Leymann,
+      George Michaelson, Jordi Palet, Michael Richardson, Nathan Sherrard,
+      Dieter Siegmund, Robert Sparks, Dave Thaler, Philipp S. Tiesel, Eric
+      Vyncke for the discussions, the input, and all contribution.</t>
+    </section>
+  </back>
+</rfc>

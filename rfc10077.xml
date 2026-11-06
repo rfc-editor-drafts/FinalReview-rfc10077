@@ -46,7 +46,7 @@
       </address>
     </author>
 
-    <date year="2026" month="June"/>
+    <date year="2026" month="November"/>
 
     <area>OPS</area>
     <workgroup>v6ops</workgroup>
@@ -64,20 +64,28 @@
       <t>464XLAT defines an architecture for providing IPv4 connectivity
       across an IPv6-only network. The solution involves two functional
       elements: a provider-side translator (PLAT) and a customer-side
-      translator (CLAT). This document updates the 464XLAT specification
-      (RFC 6877) and Requirements for IPv6 Customer Edge Routers (RFC 8585) by
-      further defining CLAT node behavior and IPv6 Customer Edge Routers to
-      support IPv4-as-a-Service by providing recommendations for node
-      developers on enabling and disabling CLAT.</t>
+      translator (CLAT). This document updates "464XLAT: Combination of Stateful and Stateless Translation"
+      (RFC 6877) and  "Requirements for IPv6 Customer Edge Routers to Support IPv4-as-a-Service" (RFC 8585) by
+      further defining the behavior of CLAT nodes and IPv6 customer edge routers to
+      support IPv4-as-a-Service and by providing recommendations to node
+      developers on enabling and disabling CLATs.</t>
     </abstract>
   </front>
 
   <middle>
     <section>
       <name>Introduction</name>
+<!-- [rfced] Section 1. In the following sentence should "customer equipment (CE) routers" be "customer edge (CE) routers" instead?
 
+Original:
+   464XLAT is widely deployed in 3GPP networks (as described in
+   Section 4.2 of [RFC6877]) where User Equipment (UE) such as mobile
+   phones and customer equipment (CE) routers perform the customer-side
+   translation (CLAT) function, providing an IPv4 address and default
+   route for applications and tethered devices.  
+-->
       <t>464XLAT is widely deployed in 3GPP networks (as described in 
-      <xref section="4.2" target="RFC6877"/>) where User Equipment (UE) such as
+      <xref section="4.2" target="RFC6877"/>) where user equipment (UE) such as
       mobile phones and customer equipment (CE) routers perform the
       customer-side translation (CLAT) function, providing an IPv4 address and
       default route for applications and tethered devices. Enabling 464XLAT
@@ -277,19 +285,19 @@
       disabling CLAT and any other changes to CLAT configuration or network
       signals CLAT is acting on to support administrator debugging and
       auditing. As logging is mostly beneficial in managed environments, the
-      logging behaviour <bcp14>SHOULD</bcp14> be configurable. The logging <bcp14>SHOULD</bcp14> be disabled
+      logging behavior <bcp14>SHOULD</bcp14> be configurable. The logging <bcp14>SHOULD</bcp14> be disabled
       by default to avoid performance impacts when the likelihood of anyone
       consuming the logs is low.</t>
 
       <t>There are some corner cases when an administrator might prefer the
       node to use CLAT even if native IPv4 connectivity is available (e.g.,
       for performance reasons, if IPv4-as-a-Service performs better than
-      native IPv4). This behaviour might be desirable for devices which do not
+      native IPv4). This behavior might be desirable for devices which do not
       move between networks, such as servers or workstations, where the
       administrator might want to have CLAT enabled unconditionally. However
-      for the reasons described above such behaviour <bcp14>MUST</bcp14> be explicitly
+      for the reasons described above such behavior <bcp14>MUST</bcp14> be explicitly
       enabled by the administrator via configuration and <bcp14>MUST NOT</bcp14> be a default
-      behaviour, especially for unmanaged nodes.</t>
+      behavior, especially for unmanaged nodes.</t>
     </section>
 
     <section anchor="addr">
@@ -499,7 +507,7 @@
         </section>
 
         <section>
-          <name>CLAT vs non-CLAT IPv6 Addresses Behaviour</name>
+          <name>CLAT vs non-CLAT IPv6 Addresses Behavior</name>
 
           <t>Reports from the field indicate that some CLAT implementations
           exhibit different behavior for their CLAT IPv6 addresses compared to
@@ -617,7 +625,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
       the <em>same PIOs and NAT64 prefix</em>, <bcp14>SHOULD</bcp14> only create one CLAT
       instance using one of the PIOs to form a CLAT address.</t>
 
-      <t>A node can discover multiple routers on the same interface signalling
+      <t>A node can discover multiple routers on the same interface signaling
       <em>different PIOs and NAT64 prefixes</em>. In that case, the node <bcp14>MAY</bcp14>
       create one CLAT instance for each tuple of PIO and NAT64 prefix (both
       PIO and NAT64 prefix in a given tuple <bcp14>MUST</bcp14> be advertised by the same
@@ -716,8 +724,8 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
             <ul>
               <li>
                 <t>has changed its state from being reachable or probably
-                reachable to being unknown or suspect (i.e., its neighbor
-                cache entry moved to the 'INCOMPLETE' state or ceased to
+                reachable to being unknown or suspect (i.e., its Neighbor
+                Cache entry moved to the 'INCOMPLETE' state or ceased to
                 exist, see <xref target="RFC4861" section="6.3.6"/>).</t>
               </li>
 
@@ -770,7 +778,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
         <t>This document updates <xref target="RFC6877" section="6.3"/> by
         relaxing the requirement to acquire a dedicated /64 prefix for the
         purpose of sending and receiving statelessly translated packets. More
-        details on the recommended node behaviour can be found in <xref
+        details on the recommended node behavior can be found in <xref
         target="slaac"/>.</t>
       </section>
 <!-- [rfced] Note to PE: OLD TEXT from RFC 8585 is correct. -->
@@ -944,7 +952,7 @@ Current:
       provides non-link-local IPv4 connectivity, as outlined in <xref
       target="disable" />.</t>
 
-      <t>However, the recommended behaviour (disabling CLAT in the presence of
+      <t>However, the recommended behavior (disabling CLAT in the presence of
       native IPv4 connectivity) introduces another attack vector: a rogue
       DHCPv4 server. An attacker can provide the CLAT node with an IPv4
       address and default gateway, causing the node to disable CLAT. Similarly
@@ -1128,12 +1136,21 @@ or left in their current order?
       Healy"/>, <contact fullname="Ed Horley"/>, <contact fullname="KAWASHIMA
       Masanobu"/>, <contact fullname="Ted Lemon"/>, <contact fullname="Nicolai
       Leymann"/>, <contact fullname="George Michaelson"/>, <contact
-      fullname="Jordi Palet"/>, <contact fullname="Michael Richardson"/>,
+      fullname="Jordi Palet Martinez"/>, <contact fullname="Michael Richardson"/>,
       <contact fullname="Nathan Sherrard"/>, <contact fullname="Dieter
       Siegmund"/>, <contact fullname="Robert Sparks"/>, <contact
       fullname="Dave Thaler"/>, <contact fullname="Philipp S. Tiesel"/>, and
-      <contact fullname="Eric Vyncke"/> for the discussions, the input, and
+      <contact fullname="Éric Vyncke"/> for the discussions, the input, and
       all contribution.</t>
     </section>
   </back>
+  <!-- [rfced] Please review the "Inclusive Language" portion of the online 
+  Style Guide <https://www.rfc-editor.org/authors/rfc-style-guide/#inclusive-language>
+  and let us know if any changes are needed.  Updates of this nature typically
+  result in more precise language, which is helpful for readers.
+  
+  For example, please consider whether the following should be updated: 
+  native and man-in-the-middle
+  -->
+  
 </rfc>

@@ -7,12 +7,12 @@
  <!ENTITY wj     "&#8288;">
 ]> 
 
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-v6ops-claton-16" number="0000" ipr="trust200902" obsoletes="" submissionType="IETF" updates="6877, 8585" version="3" xml:lang="en" consensus="true" symRefs="true" sortRefs="false" tocInclude="true">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-v6ops-claton-16" number="10077" ipr="trust200902" obsoletes="" submissionType="IETF" updates="6877, 8585" version="3" xml:lang="en" consensus="true" symRefs="true" sortRefs="false" tocInclude="true">
 
   <front>
     <title abbrev="claton">464XLAT Customer-side Translator (CLAT): Node
     Behavior and Recommendations</title>
-    <seriesInfo name="RFC" value="0000"/>
+    <seriesInfo name="RFC" value="10077"/>
     <author fullname="Lorenzo Colitti" initials="L." surname="Colitti">
       <organization>Google</organization>
       <address>
@@ -792,7 +792,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
         <t>464XLAT requirements:</t>
 
         <t>464XLAT-0: The IPv6 Transition CE Router <bcp14>SHOULD</bcp14> follow
-        recommendations provided in RFC XXXX).</t>
+        recommendations provided in RFC 10077.</t>
 	</blockquote>
 
         <t>OLD TEXT:</t>

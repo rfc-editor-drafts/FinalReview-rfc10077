@@ -552,7 +552,7 @@ Table of Contents
    When a node creates a single CLAT instance and must choose between
    multiple PIOs, the node SHOULD select a single PIO using the same
    algorithm as for choosing the source address for a destination within
-   the selected NAT64 prefix ([RFC6724], updated by [RFCYYY1]).
+   the selected NAT64 prefix ([RFC6724], updated by [RFC10076]).
 
    Discussion: This approach, leveraging the default source address
    selection algorithm (Section 5 of [RFC6724]), typically results in
@@ -566,7 +566,7 @@ Table of Contents
       beneficial as ULA source packets may not reach PLAT devices.
 
    *  For network-specific NAT64 prefixes within the known-local ULA
-      range [RFCYYY1], the ULA prefix is preferred.  This can be
+      range [RFC10076], the ULA prefix is preferred.  This can be
       advantageous in home and enterprise environments where
       administrators intend to perform NAT64 for specific source
       prefixes only.
@@ -752,7 +752,7 @@ Table of Contents
       might be able to perform man-in-the-middle attacks (active attack
       on insecure traffic or hoarding secure traffic for "Harvest Now,
       Decrypt Later" attacks for non-PQC secure traffic, see Section 8
-      of [I-D.ietf-pquip-pqc-engineers]).
+      of [RFC9958]).
 
    Rogue RAs can also disturb traffic to destinations that support both
    IPv4 and IPv6 by causing IPv6 through an attacker's PLAT to be used
@@ -967,10 +967,10 @@ Table of Contents
               (DHCPv6)", STD 102, RFC 9915, DOI 10.17487/RFC9915,
               January 2026, <https://www.rfc-editor.org/info/rfc9915>.
 
-   [RFCYYY1]  Buraglio, N., Chown, T., and J. Duncan, "Prioritizing
+   [RFC10076] Buraglio, N., Chown, T., and J. Duncan, "Prioritizing
               known-local IPv6 ULAs through address selection policy",
-              RFC YYY1, DOI 10.17487/RFCYYY1, June 2026,
-              <https://www.rfc-editor.org/info/rfcYYY1>.
+              RFC 10076, DOI 10.17487/RFC10076, June 2026,
+              <https://www.rfc-editor.org/info/rfc10076>.
 
 14.2.  Informative References
 
@@ -1021,44 +1021,40 @@ Table of Contents
               Renumbering Events", RFC 8978, DOI 10.17487/RFC8978, March
               2021, <https://www.rfc-editor.org/info/rfc8978>.
 
-   [I-D.ietf-pquip-pqc-engineers]
-              Banerjee, A., Reddy.K, T., Schoinianakis, D., Hollebeek,
+   [RFC9958]  Banerjee, A., Reddy.K, T., Schoinianakis, D., Hollebeek,
               T., and M. Ounsworth, "Post-Quantum Cryptography for
-              Engineers", Work in Progress, Internet-Draft, draft-ietf-
-              pquip-pqc-engineers-14, 25 August 2025,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-pquip-
-              pqc-engineers-14>.
+              Engineers", RFC 9958, DOI 10.17487/RFC9958, June 2026,
+              <https://www.rfc-editor.org/info/rfc9958>.
 
    [I-D.ietf-6man-slaac-renum]
-              Gont, F., Zorz, J., Patterson, R., and J. Linkova,
-              "Improving the Robustness of Stateless Address
-              Autoconfiguration (SLAAC) to Flash Renumbering Events",
-              Work in Progress, Internet-Draft, draft-ietf-6man-slaac-
-              renum-13, 15 February 2026,
+              Gont, F., Zorz, J., and R. Patterson, "Improving the
+              Robustness of Stateless Address Autoconfiguration (SLAAC)
+              to Flash Renumbering Events", Work in Progress, Internet-
+              Draft, draft-ietf-6man-slaac-renum-14, 5 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-6man-
-              slaac-renum-13>.
+              slaac-renum-14>.
 
    [I-D.ietf-v6ops-icmpext-xlat-v6only-source]
               Lamparter, D. E. and J. Linkova, "Using Dummy IPv4 Address
               and Node Identification Extensions for IP/ICMP translators
               (XLATs)", Work in Progress, Internet-Draft, draft-ietf-
-              v6ops-icmpext-xlat-v6only-source-01, 6 November 2025,
+              v6ops-icmpext-xlat-v6only-source-03, 2 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-v6ops-
-              icmpext-xlat-v6only-source-01>.
+              icmpext-xlat-v6only-source-03>.
 
    [I-D.ietf-masque-connect-ip-dns]
               Schinazi, D. and Y. Rosomakho, "DNS and PREF64
               Configuration for Proxying IP in HTTP", Work in Progress,
-              Internet-Draft, draft-ietf-masque-connect-ip-dns-06, 12
-              April 2026, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-masque-connect-ip-dns-06>.
+              Internet-Draft, draft-ietf-masque-connect-ip-dns-07, 13
+              October 2026, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-masque-connect-ip-dns-07>.
 
    [I-D.ietf-v6ops-6mops]
               Buraglio, N., Caletka, O., and J. Linkova, "IPv6-mostly
               Networks: Deployment and Operations Considerations", Work
-              in Progress, Internet-Draft, draft-ietf-v6ops-6mops-07, 2
-              March 2026, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-v6ops-6mops-07>.
+              in Progress, Internet-Draft, draft-ietf-v6ops-6mops-12, 29
+              October 2026, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-v6ops-6mops-12>.
 
    [I-D.link-6man-gulla]
               Linkova, J., "Using Prefix-Specific Link-Local Addresses

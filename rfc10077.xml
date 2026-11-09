@@ -318,7 +318,7 @@ Original:
         addresses using a dedicated IPv6 prefix per <xref target="RFC6052" />,
         or perform a stateful NAT44 between these IPv4 addresses and a
         dedicated CLAT IPv4 address, which is then statelessly translated to a
-        single dedicated IPv6 address. In both cases, even with stateful
+        single, dedicated IPv6 address. In both cases, even with stateful
         NAT44, translation between IPv4 and IPv6 is stateless.</t>
 <!-- [rfced] Section 6.1. We're having difficulty parsing the following sentence. It seems that "This section" applies to two scenarios.
 
@@ -386,15 +386,15 @@ Perhaps:
 
           <t><xref target="RFC6877" section="6.3"/> recommends that a CLAT
           instance acquires a dedicated /64 for translating between IPv4 and
-          IPv6, and only uses a single interface IPv6 address if a dedicated
+          IPv6 and only uses a single interface IPv6 address if a dedicated
           prefix is not available via DHCPv6 Prefix Delegation (DHCPv6-PD) <xref target="RFC9915" />.
           However, deployments where each node can obtain a dedicated /64 just
           for CLAT are rather uncommon, especially in environments such as
-          enterprise networks and Wi-Fi hotspots. Quite often the CLAT
+          enterprise networks and Wi-Fi hotspots. Quite often, the CLAT
           instance uses a single IPv6 address as a source for all IPv4 traffic
-          translated by CLAT. In particular, if the CLAT only provides the
+          translated by CLAT. In particular, if the CLAT node only provides the
           IPv4 connectivity to applications local to the node (or if the node
-          chooses to perform stateful NAT44) the CLAT instance only needs a
+          chooses to perform stateful NAT44), the CLAT instance only needs a
           single CLAT IPv6 address, so obtaining a /64 is wasteful. For
           instance, a home network that gets a /60 from its ISP can only
           connect up to 15 CLAT devices before it runs out of available
@@ -424,7 +424,7 @@ Perhaps:
                 <li>
                   <t>Perform stateful NAT44 from the downstream IPv4 addresses
                   to a single IPv4 address and then perform stateless
-                  translation of that single IPv4 address to a single
+                  translation of that single IPv4 address to a single,
                   dedicated IPv6 address.</t>
                 </li>
               </ul>
@@ -474,8 +474,8 @@ Perhaps:
 
             <li>
               <t>An ICMPv6 error packet from a global IPv6 address (not
-              belonging to the NAT64 prefix) might be a response to either
-              native IPv6 traffic from the host, or CLAT traffic (see <xref
+              belonging to the NAT64 prefix) might be a response either to
+              native IPv6 traffic from the host or to CLAT traffic (see <xref
               target="I-D.ietf-v6ops-icmpext-xlat-v6only-source" /> for more
               details).</t>
             </li>
@@ -483,7 +483,7 @@ Perhaps:
 
           <t>Therefore, in the absence of dedicated IPv6 addresses, the
           architecture would need additional stateful elements on the client
-          side which are not part of 464XLAT as defined in <xref
+          side that are not part of 464XLAT as defined in <xref
           target="RFC6877" />. Discussion of such architectures is beyond the
           scope of this document.</t>
 
@@ -511,7 +511,7 @@ Perhaps:
             </li>
           </ul>
 
-          <t>To protect user privacy and prevent user tracking through CLAT
+          <t>To protect user privacy and to prevent user tracking through CLAT
           addresses, the node <bcp14>SHOULD</bcp14> generate a different interface identifier
           for the CLAT address when connecting to different networks, even if
           the NAT64 prefix and the local IPv4 CLAT address do not change. In
@@ -536,7 +536,7 @@ Perhaps:
               <t>The node <bcp14>MUST</bcp14> perform Duplicate Address Detection (DAD) for
               each dedicated CLAT address (<xref
               target="RFC4862" section="5.4"/>).</t>
-                  <t>Justification: performing DAD minimizes loss of
+                  <t>Justification: Performing DAD minimizes loss of
                   connectivity in the unlikely event of address collision.
                   Additionally, real world deployment experience shows that
                   network infrastructure devices mandate a DAD packet from the
@@ -549,7 +549,7 @@ Perhaps:
               the node would process NSes for a non-CLAT address. This is to
               avoid unexpected packet loss for applications.</t>
                   <t>Justification: A simple example is if a node doesn't
-                  respond to unicast NSes, anytime the first-hop router gets a
+                  respond to unicast NSes, any time the first-hop router gets a
                   packet for the CLAT address and its Neighbor Cache entry is
                   'STALE' (<xref target="RFC4861" section="7.3.2"/>), the
                   Neighbor Unreachability Detection process 
@@ -565,10 +565,10 @@ Perhaps:
               <t>If the node supports Gratuitous Neighbor Advertisements <xref
               target="RFC9131" />, the node <bcp14>SHOULD</bcp14> send them for the CLAT
               addresses.</t>
-                  <t>Justification: not following this recommendation leads to
+                  <t>Justification: Not following this recommendation leads to
                   user-visible packet loss when the CLAT instance starts
-                  receiving traffic after a period of inactivity, or when
-                  connected to the network for the first time. The problem is
+                  receiving traffic after a period of inactivity, or when it
+                  connects to the network for the first time. The problem is
                   discussed in <xref target="RFC9131" section="2"/>.</t>
             </li>
 
@@ -577,7 +577,7 @@ Perhaps:
               target="RFC9686" /> enabled <bcp14>MUST</bcp14> register the CLAT addresses the
               same way as non-CLAT addresses, if the network supports the
               registration.</t>
-                  <t>Justification: not registering CLAT addresses reduces
+                  <t>Justification: Not registering CLAT addresses reduces
                   traffic visibility for network operators, which complicates
                   troubleshooting and forensics, as discussed in <xref
                   target="RFC9686" />.</t>
@@ -620,9 +620,9 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
       <t>The Provisioning Domain (PvD) architecture <xref target="RFC7556" />
       provides a mechanism for a PvD-aware node to operate correctly in such
       scenarios (see <xref target="RFC8801" />). However, at the time of
-      writing PvD support is uncommon for host operating systems, and PvD
+      writing PvD, support is uncommon for host operating systems, and PvD
       support is not widely deployed by network operators. Therefore this
-      document focuses on scenarios when the node is not PvD-aware.</t>
+      document focuses on scenarios when the node is not PvD aware.</t>
 
       <t>This document does not aim to define CLAT behavior for every possible
       multi-router/multi-prefix scenario. Instead, this section provides
@@ -635,7 +635,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
       link-local addresses.</t>
 
       <t>A node discovering multiple routers on the same interface advertising
-      the <em>same PIOs and NAT64 prefix</em>, <bcp14>SHOULD</bcp14> only create one CLAT
+      the <em>same PIOs and NAT64 prefix</em> <bcp14>SHOULD</bcp14> only create one CLAT
       instance using one of the PIOs to form a CLAT address.</t>
 
       <t>A node can discover multiple routers on the same interface signaling

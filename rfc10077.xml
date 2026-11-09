@@ -75,7 +75,7 @@
   <middle>
     <section>
       <name>Introduction</name>
-<!-- [rfced] Section 1. In the following sentence should "customer equipment (CE) routers" be "customer edge (CE) routers" instead?
+<!-- [rfced] Section 1. In the following sentence, should "customer equipment (CE) routers" be "customer edge (CE) routers" instead?
 
 Original:
    464XLAT is widely deployed in 3GPP networks (as described in
@@ -87,7 +87,7 @@ Original:
       <t>464XLAT is widely deployed in 3GPP networks (as described in 
       <xref section="4.2" target="RFC6877"/>) where user equipment (UE) such as
       mobile phones and customer equipment (CE) routers perform the
-      customer-side translation (CLAT) function, providing an IPv4 address and
+      customer-side translator (CLAT) function, providing an IPv4 address and
       default route for applications and tethered devices. Enabling 464XLAT
       allowed mobile operators to transition UE to IPv6-only mode, where UE
       cellular interfaces have only IPv6 addresses, and no forwardable IPv4
@@ -95,9 +95,9 @@ Original:
 
       <t>IPv6-only hosts used to be rather uncommon outside of mobile networks
       and datacenters. Even if a network offers provider-side translator
-      (PLAT) functionality in the form of NAT64 <xref target="RFC6146" />,
-      hosts (desktops, laptops, etc.) still needed the network to provide IPv4
-      connectivity, as otherwise applications which require IPv4 would fail.
+      (PLAT) functionality in the form of Network Address and Protocol Translation from IPv6 Clients to IPv4 Servers (NAT64) <xref target="RFC6146" />,
+      hosts (desktops, laptops, etc.) still need the network to provide IPv4
+      connectivity, as otherwise applications that require IPv4 would fail.
       However, as more and more operating systems outside of the 3GPP world
       support CLAT, it becomes possible to migrate those devices to IPv6-only
       mode, while still providing IPv4-as-a-Service via 464XLAT. Networks such
@@ -115,7 +115,7 @@ Original:
       </ul>
 
       <t>In another variation of the 464XLAT deployment (<xref
-      target="RFC6877" section="4.1"/>) a CE router is connected to an IPv6-only network
+      target="RFC6877" section="4.1"/>), a CE router is connected to an IPv6-only network
       and provides CLAT functions for IPv4-enabled downstream devices. <xref
       target="RFC8585" /> specifies 464XLAT support requirements for such
       devices.</t>
@@ -123,9 +123,9 @@ Original:
       <t>While <xref target="RFC6877" section="6"/> discusses implementation
       considerations for the 464XLAT architecture, there is a need for more
       detailed guidance for CLAT implementations. The increase in IPv6-only
-      deployments has provided valuable operational experience, which has
+      deployments has provided valuable operational experience that has
       revealed gaps in existing CLAT requirements. This document addresses
-      these gaps by specifying normative behavior and providing
+      these gaps by specifying normative behavior and by providing
       recommendations for implementing CLAT functions. For example, it
       provides guidance on how CLAT nodes (such as a host or a CE router)
       should enable CLAT when connecting to an IPv6-only network and how they
@@ -154,14 +154,14 @@ Original:
       section="2" target="RFC6877" /> and additionally defines the following terms:</t>
 
       <dl spacing="normal" newline="false">
-          <dt>CLAT Node:</dt><dd>a node (a host or a router) that performs CLAT
+          <dt>CLAT node:</dt><dd>A node (a host or a router) that performs CLAT
           functions by running one or multiple CLAT instances (e.g., one CLAT
           instance per interface). "CLAT" is also used in this document to
-          describe the functionality provided by a CLAT Node as a commonly
+          describe the functionality provided by a CLAT node as a commonly
           understood shorthand.</dd>
 
           <dt>IPv4-only application:</dt><dd>An application that requires the presence
-          of an IPv4 address and/or IPv4 default route to operate. Examples
+          of an IPv4 address and/or an IPv4 default route to operate. Examples
           include, but are not limited to, applications using IPv4 address
           literals or opening IPv4-only sockets.</dd>
 
@@ -175,19 +175,19 @@ Original:
           without using any form of IPv4-as-a-Service or IP address family
           translation mechanisms (such as 464XLAT).</dd>
 
-          <dt>ULA:</dt><dd>Unique Local Addresses <xref target="RFC4193" />.</dd>
+          <dt>ULA:</dt><dd>Unique Local Address <xref target="RFC4193" />.</dd>
       </dl>
     </section>
 
     <section anchor="enable">
       <name>Enabling CLAT</name>
 
-      <t>For performance and security reasons CLAT <bcp14>SHOULD NOT</bcp14> be enabled
+      <t>For performance and security reasons, CLAT <bcp14>SHOULD NOT</bcp14> be enabled
       (unless explicitly configured otherwise) for an interface if the node
       has native IPv4 connectivity over that interface (see <xref
       target="disable" /> for more details). Therefore, recommendations
       provided in this section are only applicable to the IPv6-only interfaces
-      of a given node (the node has no native IPv4 connectivity via that
+      of a given node (i.e., the node has no native IPv4 connectivity via that
       interface).</t>
 
       <t>To enable CLAT, an IPv6-only node needs to discover the PLAT-side
@@ -198,10 +198,10 @@ Original:
       supports PLAT (NAT64) functionality. In some cases, a node might
       configure its IPv6 stack without receiving an RA (for example, via HTTP
       Capsules, see <xref target="I-D.ietf-masque-connect-ip-dns" />).
-      Therefore an IPv6-only node <bcp14>SHOULD</bcp14> enable CLAT as soon as it receives a
+      Therefore, an IPv6-only node <bcp14>SHOULD</bcp14> enable CLAT as soon as it receives a
       PREF64 option from the network.</t>
 
-      <t>Discussion: this document does not require that a node <bcp14>MUST</bcp14> enable
+      <t>Discussion: This document does not require that a node <bcp14>MUST</bcp14> enable
       CLAT upon receiving an RA because enabling CLAT by default may be
       undesirable in certain scenarios. First, in a controlled deployment
       environment, an administrator might explicitly prefer that the node not
@@ -213,7 +213,7 @@ Original:
       <t>A node may have multiple IPv6-only interfaces (for example, a mobile
       phone can be connected to an IPv6-only Wi-Fi network and to an IPv6-only
       mobile network). The node <bcp14>MAY</bcp14> choose to enable CLAT on a subset of its
-      interfaces connected to networks equipped with PLAT. In that case the
+      interfaces connected to networks equipped with PLAT. In that case, the
       node <bcp14>MUST</bcp14> run an independent, dedicated CLAT instance on each interface
       the node chooses to enable CLAT on. Consequently, each CLAT instance
       <bcp14>MUST</bcp14> install a separate default IPv4 route on each CLAT-enabled
@@ -242,7 +242,7 @@ Original:
       NAT64 prefix. The node <bcp14>SHOULD NOT</bcp14> wait for an explicit (DHCP Option 108)
       or an implicit (DHCP timeouts) indication that native IPv4 connectivity
       is not available. However, to mitigate attacks described in 
-      <xref target="RFC7050" section="7"/> the node <bcp14>MAY</bcp14> delay enabling CLAT if the NAT64
+      <xref target="RFC7050" section="7"/>, the node <bcp14>MAY</bcp14> delay enabling CLAT if the NAT64
       prefix was discovered via DNS <xref target="RFC7050" /> only. Such a
       delay minimizes the chance of temporary control of traffic by an
       attacker at the expense of delayed IPv4 connectivity through CLAT. The
@@ -273,15 +273,15 @@ Original:
       impactful for all applications and traffic flows already utilizing CLAT.
       However, disabling CLAT is recommended not only from a performance
       perspective, but also from a security point of view. <xref
-      target="Security" /> discusses this aspect in more details.</t>
+      target="Security" /> discusses this aspect in more detail.</t>
 
       <t>Native IPv4 connectivity, which subsequently causes CLAT to be
       disabled, might not be intended by the administrator. It could instead
       be the result of a network misconfiguration (such as accidentally
       enabling IPv4) or an attack (such as a rogue DHCPv4 server). In such
-      cases it might be useful for an administrator to receive signals when
-      CLAT turns on or off as well as changes to network-received
-      configuration. Therefore the node <bcp14>SHOULD</bcp14> support logging the reason for
+      cases, it might be useful for an administrator to receive signals when
+      CLAT turns on or off as well as when changes to network-received
+      configuration occur. Therefore, the node <bcp14>SHOULD</bcp14> support logging the reason for
       disabling CLAT and any other changes to CLAT configuration or network
       signals CLAT is acting on to support administrator debugging and
       auditing. As logging is mostly beneficial in managed environments, the
@@ -291,11 +291,11 @@ Original:
 
       <t>There are some corner cases when an administrator might prefer the
       node to use CLAT even if native IPv4 connectivity is available (e.g.,
-      for performance reasons, if IPv4-as-a-Service performs better than
-      native IPv4). This behavior might be desirable for devices which do not
+      for performance reasons if IPv4-as-a-Service performs better than
+      native IPv4). This behavior might be desirable for devices that do not
       move between networks, such as servers or workstations, where the
-      administrator might want to have CLAT enabled unconditionally. However
-      for the reasons described above such behavior <bcp14>MUST</bcp14> be explicitly
+      administrator might want to have CLAT enabled unconditionally. However,
+      for the reasons described above, such behavior <bcp14>MUST</bcp14> be explicitly
       enabled by the administrator via configuration and <bcp14>MUST NOT</bcp14> be a default
       behavior, especially for unmanaged nodes.</t>
     </section>
@@ -308,19 +308,32 @@ Original:
 
         <t>A CLAT instance provides an IPv4 address and the default IPv4 route
         to the local node's network stack. However, the node can also extend
-        the network downstream and provides IPv4 network connectivity to other
+        the network downstream and provide IPv4 network connectivity to other
         connected systems (e.g., tethering). Those systems can be physical
-        (e.g., various clients connected to a CE router), or logical (e.g.,
+        (e.g., various clients connected to a CE router) or logical (e.g.,
         virtual systems running on a node, while the host system acts as a
         router and performs CLAT). In all those cases, systems behind a CLAT
-        node usually use <xref target="RFC1918" /> addresses. A CLAT instance
+        node usually use private Internet IPv4 addresses <xref target="RFC1918" />. A CLAT instance
         can either translate these IPv4 addresses statelessly into IPv6
         addresses using a dedicated IPv6 prefix per <xref target="RFC6052" />,
         or perform a stateful NAT44 between these IPv4 addresses and a
         dedicated CLAT IPv4 address, which is then statelessly translated to a
         single dedicated IPv6 address. In both cases, even with stateful
         NAT44, translation between IPv4 and IPv6 is stateless.</t>
+<!-- [rfced] Section 6.1. We're having difficulty parsing the following sentence. It seems that "This section" applies to two scenarios.
 
+Original:
+   This section only applies to a single dedicated IPv4 address which a
+   CLAT instance uses for providing network connectivity only to local
+   applications or using stateful NAT44 when extending network
+   connectivity downstream.
+
+Perhaps:
+   This section applies either to a single, dedicated IPv4 address that a
+   CLAT instance uses to provide network connectivity to local
+   applications only or to the CLAT's use of stateful NAT44 when extending network
+   connectivity downstream.
+-->
         <t>This section only applies to a single dedicated IPv4 address which
         a CLAT instance uses for providing network connectivity only to local
         applications or using stateful NAT44 when extending network
@@ -329,10 +342,10 @@ Original:
         <t>A CLAT instance needs a single IPv4 CLAT address and a single
         CLAT-only IPv6 address (which is distinct from the one or more IPv6
         addresses used by the node running CLAT for its own native IPv6
-        connectivity, see <xref target="slaac" />). A node providing CLAT
+        connectivity; see <xref target="slaac" />). A node providing CLAT
         functions to local applications <bcp14>SHOULD</bcp14> use IPv4 addresses from the
         dedicated 192.0.0.0/29 range <xref target="RFC7335" /> because it is
-        reserved for IPv4 continuity solutions including but not limited to
+        reserved for IPv4 continuity solutions including, but not limited to,
         464XLAT. Use of other source IP addresses is technically possible but
         might result in incorrect assumptions made by other processes relying
         on the presence of a source IPv4 address with a 192.0.0.0/29 prefix to
@@ -340,8 +353,8 @@ Original:
         runs multiple CLAT instances, the node <bcp14>SHOULD</bcp14> use different local IPv4
         addresses for each CLAT instance. This approach limits the number of
         CLAT instances per node to 8, which seems to be more than sufficient
-        for typical configurations at the time of this writing. If in the
-        future some deployment scenarios require more than 8 CLAT instances
+        for typical configurations at the time of this writing. If, in the
+        future, some deployment scenarios require more than 8 CLAT instances
         per node, a new IPv4 range will be requested from IANA.</t>
 
         <t>The node <bcp14>MUST NOT</bcp14> send packets to the network from the local CLAT
@@ -354,10 +367,10 @@ Original:
         prefix.</t>
 
         <t>It should be noted that 192.0.0.0/29 is shared between multiple
-        IPv4 continuity solutions such as 464XLAT and DS-Lite (see <xref
+        IPv4 continuity solutions such as 464XLAT and Dual-Stack Lite (DS-Lite) (see <xref
         target="RFC7335" />). For example, <xref section="10"
-        target="RFC6333" /> reserves 192.0.0.1 for the Dual-Stack Lite default
-        router. However, as per <xref target="RFC7335" section="4"/>, the
+        target="RFC6333" /> reserves 192.0.0.1 for the DS-Lite default
+        router. However, per <xref target="RFC7335" section="4"/>, the
         node "<bcp14>MUST NOT</bcp14> enable two active IPv4 continuity solutions
         simultaneously in a way that would cause a node to have overlapping
         192.0.0.0/29 address space" <xref target="RFC7335" />. Therefore, as
@@ -374,7 +387,7 @@ Original:
           <t><xref target="RFC6877" section="6.3"/> recommends that a CLAT
           instance acquires a dedicated /64 for translating between IPv4 and
           IPv6, and only uses a single interface IPv6 address if a dedicated
-          prefix is not available via DHCPv6-PD <xref target="RFC9915" />.
+          prefix is not available via DHCPv6 Prefix Delegation (DHCPv6-PD) <xref target="RFC9915" />.
           However, deployments where each node can obtain a dedicated /64 just
           for CLAT are rather uncommon, especially in environments such as
           enterprise networks and Wi-Fi hotspots. Quite often the CLAT
@@ -1152,5 +1165,18 @@ or left in their current order?
   For example, please consider whether the following should be updated: 
   native and man-in-the-middle
   -->
+  <!-- [rfced] Terminology. 
+  NAT44 - How should the term NAT44 be expanded? Is there an RFC that should be cited for it? 
+  -->
+  <!-- [rfced] FYI - We have added expansions for the following
+  abbreviations per Section 3.6 of RFC 7322 ("RFC Style Guide").
+  Please review each expansion in the document carefully to
+  ensure correctness.
+ 
+  DHCPv6-PD - DHCPv6 Prefix Delegation 
+  DS-Lite - Dual-Stack Lite
+  NAT64 - Network Address and Protocol Translation from IPv6 Clients to IPv4 Servers
+  -->
+  
   
 </rfc>

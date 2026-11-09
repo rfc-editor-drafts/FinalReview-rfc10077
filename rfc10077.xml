@@ -507,7 +507,7 @@ Original:
         </section>
 
         <section>
-          <name>CLAT vs non-CLAT IPv6 Addresses Behavior</name>
+          <name>CLAT vs. Non-CLAT IPv6 Addresses Behavior</name>
 
           <t>Reports from the field indicate that some CLAT implementations
           exhibit different behavior for their CLAT IPv6 addresses compared to

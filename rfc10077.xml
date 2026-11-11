@@ -702,21 +702,13 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
         single PIO, is typically sufficient, even if the link has multiple
         assigned subnets. However, PIO selection can significantly impact user
         experience during link renumbering.</t>
-        <!-- [rfced] Note to PE: [RFC8978] appears to use "flash-renumbering" rather than "flash renumbering".
-
-             Current:
-
-               [RFC8978] discusses various examples of "flash renumbering", where the
-               IPv6 prefix assigned to the link changes without explicit host
-               notification.
-        -->
         <t><xref target="RFC8978" /> discusses various examples of "flash
         renumbering", where the IPv6 prefix assigned to the link changes
         without explicit host notification. <xref
         target="I-D.ietf-6man-slaac-renum" /> and <xref
         target="I-D.link-6man-gulla" /> discuss methods to mitigate the impact
         of flash renumbering. These methods generally rely on hosts with
-        addresses from both old and new prefixes ceasing use of the old prefix
+        addresses from both old and new prefixes ceasing the use of the old prefix
         and adopting the new prefix. For nodes running CLAT instances, this
         requires disabling instances using addresses from the old prefix and
         creating an instance using an address from the new prefix.</t>
@@ -729,6 +721,32 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
             <t>A prefix used to form the CLAT address becomes deprecated or
             invalid <xref target="RFC4862"/>.</t>
           </li>
+<!-- [rfced] Section 7.1. In the following list, does one or both of the listed events signal link renumbering?
+
+Original:
+
+   *  The router (or routers) advertising the PIO used to form the CLAT
+      address
+
+      -  has changed its state from being reachable or probably
+         reachable to being unknown or suspect (i.e., its Neighbor Cache
+         entry moved to the 'INCOMPLETE' state or ceased to exist; see
+         Section 6.3.6 of [RFC4861]).
+
+      -  ceased to be a router (see Section 7.3.3 of [RFC4861]).
+
+Perhaps:
+
+   *  The router (or routers) advertising the PIO used to form the CLAT
+      address has done one of the following:
+
+      -  changed its state from being reachable or probably
+         reachable to being unknown or suspect (i.e., its Neighbor Cache
+         entry moved to the 'INCOMPLETE' state or ceased to exist; see
+         Section 6.3.6 of [RFC4861]).
+
+      -  ceased to be a router (see Section 7.3.3 of [RFC4861]).
+-->
 
           <li>
             <t>The router (or routers) advertising the PIO used to form the
@@ -739,7 +757,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
                 <t>has changed its state from being reachable or probably
                 reachable to being unknown or suspect (i.e., its Neighbor
                 Cache entry moved to the 'INCOMPLETE' state or ceased to
-                exist, see <xref target="RFC4861" section="6.3.6"/>).</t>
+                exist; see <xref target="RFC4861" section="6.3.6"/>).</t>
               </li>
 
               <li>
@@ -752,12 +770,12 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
 
         <t>Upon receiving a signal indicating a possible renumbering event,
         the node <bcp14>SHOULD</bcp14> disable the CLAT instance(s) affected by the
-        renumbering, and create new instance(s). In case of implicit signals
-        (provided by the Neighbor Unreachability Detection, <xref
-        target="RFC4861" />, rather than by a Router Advertisement deprecating
+        renumbering and create new instance(s). In the case of implicit signals
+        (provided by the Neighbor Unreachability Detection <xref
+        target="RFC4861" /> rather than by a Router Advertisement deprecating
         or invalidating a prefix), the node <bcp14>MAY</bcp14> send Router Solicitations to
         obtain the most up-to-date network configuration information. When
-        sending Router Solicitations the node <bcp14>MUST</bcp14> follow recommendations
+        sending Router Solicitations, the node <bcp14>MUST</bcp14> follow recommendations
         specified in <xref target="RFC4861" section="6.3.7"/>. The node <bcp14>MAY</bcp14>
         react to a potential renumbering event in a "make-before-break"
         manner, when old instances are still running until all required
@@ -772,11 +790,11 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
       present), while the IPv6 header is 40 bytes. This means that when CLAT
       translates an IPv4 packet to IPv6, it usually adds 20 bytes to the
       packet size. However, when CLAT translates a fragmented IPv4 packet,
-      then Fragment Header needs to be added to the resulting IPv6 packet
-      (<xref target="RFC7915" section="4.1"/>). The length of IPv6 Fragment
+      then the Fragment Header needs to be added to the resulting IPv6 packet
+      (<xref target="RFC7915" section="4.1"/>). The length of the IPv6 Fragment
       Extension header is 8 bytes (<xref target="RFC8200" section="4.5"/>).
       Therefore, the CLAT instance <bcp14>SHOULD</bcp14> present IPv4-only applications with
-      an IPv4 MTU which is 28 bytes smaller than the IPv6 MTU of the interface
+      an IPv4 MTU that is 28 bytes smaller than the IPv6 MTU of the interface
       the instance is running on because anything higher risks undesirable IP
       fragmentation <xref target="RFC8900" /> and anything lower artifically
       restricts packet sizes for no benefit.</t>
@@ -794,7 +812,7 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
         details on the recommended node behavior can be found in <xref
         target="slaac"/>.</t>
       </section>
-<!-- [rfced] Note to PE: OLD TEXT from RFC 8585 is correct. -->
+
       <section anchor="update8585">
         <name>Updates to RFC 8585</name>
 
@@ -863,16 +881,16 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
         other <bcp14>MUST</bcp14> follow this order: 1) <xref target="RFC7225"/>, 2) <xref
         target="RFC8781" />, and 3) <xref target="RFC7050" />.</t>
 
-        <t>464XLAT-7: If the IPv6 Transition CE Router performs CLAT functions
+        <t>464XLAT-7: If the IPv6 Transition CE Router performs CLAT functions,
         it <bcp14>SHOULD</bcp14> also include the PREF64 option containing the PLAT prefix in
         Router Advertisements <xref target="RFC8781"/> sent via the LAN
-        interfaces. If the IPv6 Transition CE Router acts as a DHCP server it
+        interfaces. If the IPv6 Transition CE Router acts as a DHCP server, it
         <bcp14>SHOULD</bcp14> enable DHCP Option 108 <xref target="RFC8925"/> processing.
         The router <bcp14>SHOULD</bcp14> have a configuration knob to disable DHCP Option 108
         processing.</t>
 
         <t><xref target="RFC8781"/> allows the service provider to signal
-        NAT64 prefix independently from DNS64 presence. At the same time the
+        NAT64 prefix independently from DNS64 presence. At the same time, the
         NAT64 prefix could be discovered by means of the method defined in
         <xref target="RFC7050"/> only if the service provider uses DNS64
         <xref target="RFC6147"/>. It may be the case that the service
@@ -911,27 +929,15 @@ https://authors.ietf.org/en/reference-style-guidance#subseries-best-current-prac
           <t>If there are no PLAT (NAT64) devices, traffic to NAT64
           destinations would be dropped.</t>
         </li>
-<!-- [rfced] Please review. Section 8 of
-[RFC9958] is titled "PQC Categories". Is this
-still the correct section for this citation?
 
-Current:
-   If the attacker intercepts traffic for the NAT64 prefix (e.g., by
-   providing the victim with a bogus NAT64 prefix and steering traffic
-   for those destinations towards themselves), the attacker might be able
-   to perform man-in-the-middle attacks (active attack on insecure
-   traffic or hoarding secure traffic for "Harvest Now, Decrypt Later"
-   attacks for non-PQC secure traffic, see Section 8 of
-   [RFC9958]).
--->
         <li>
           <t>If the attacker intercepts traffic for the NAT64 prefix (e.g., by
           providing the victim with a bogus NAT64 prefix and steering traffic
           for those destinations towards themselves), the attacker might be
-          able to perform man-in-the-middle attacks (active attack on insecure
+          able to perform man-in-the-middle attacks (an active attack on insecure
           traffic or hoarding secure traffic for "Harvest Now, Decrypt Later"
-          attacks for non-PQC secure traffic, see Section 8 of <xref
-          target="RFC9958" />).</t>
+          attacks for non-PQC secure traffic; see <xref
+          target="RFC9958" section="7" />).</t>
         </li>
       </ul>
 
@@ -942,7 +948,7 @@ Current:
       <t>Using the PREF64 RA option to detect PLAT presence and the NAT64
       prefix is less prone to such attacks than DNS-based detection <xref
       target="RFC7050"/>, as the attacker needs to be on-link and be able to
-      bypass layer-2 security features such as RA Guard (see
+      bypass Layer 2 security features such as RA-Guard (see
       <xref target="RFC9872" section="4"/> for more details). Therefore <xref
       target="enable" /> recommends the PREF64 RA option as a preferred way to
       detect PLAT presence, in accordance with <xref target="RFC9872" />. If
@@ -957,7 +963,7 @@ Current:
       attack, IPv6-enabled networks need to secure RAs, e.g., by deploying
       RA-Guard <xref target="RFC6105" />. However, networks without explicit
       (intentional) IPv6 deployment are inherently IPv6-ignorant, and
-      consequently might lack IPv6 security features. In such networks
+      consequently might lack IPv6 security features. In such networks,
       IPv6-enabled endpoints may be inadvertently exposed to link-local IPv6
       connectivity. This unintended exposure can facilitate PLAT presence
       signal falsification, as described above. This document mitigates this
@@ -968,7 +974,7 @@ Current:
       <t>However, the recommended behavior (disabling CLAT in the presence of
       native IPv4 connectivity) introduces another attack vector: a rogue
       DHCPv4 server. An attacker can provide the CLAT node with an IPv4
-      address and default gateway, causing the node to disable CLAT. Similarly
+      address and default gateway, causing the node to disable CLAT. Similar
       to the spoofed PLAT presence case discussed above, a rogue DHCP server
       allows the attacker to implement:</t>
 
@@ -985,9 +991,9 @@ Current:
       </ul>
 
       <t>It should be noted that such attacks are not specific to the CLAT
-      scenario, and can occur in IPv4-only or dual-stack networks as well.
+      scenario and can occur in IPv4-only or dual-stack networks as well.
       Various well-known Layer 2 security techniques (such as DHCP snooping)
-      are available and considered a best practice in IPv4-enabled
+      are available and are considered a best practice in IPv4-enabled
       deployments. To mitigate rogue DHCPv4 server attacks on CLAT nodes,
       network administrators can deploy DHCPv4-related security features even
       if the network is expected to operate in IPv6-only mode.</t>
@@ -1016,7 +1022,7 @@ Current:
       CLAT IPv6 address for an extensive period of time or, much worse, uses
       the same interface ID for the CLAT address when connecting to different
       networks, eavesdroppers and information collectors could potentially
-      correlate various network activity to the same node. To mitigate that
+      correlate various network activities to the same node. To mitigate that
       risk and make address-based network-activity correlation more difficult,
       <xref target="slaac" /> recommends that the node <bcp14>SHOULD</bcp14> generate a
       different interface identifier for the CLAT address when connecting to
@@ -1024,9 +1030,9 @@ Current:
 
       <t>It should be noted that the node's CLAT IPv6 address is only used
       (and visible to observers) when the traffic is carried from the CLAT
-      node to the PLAT. In the vast majority of the cases it means that
-      address is never visible outside of the network boundary, so to perform
-      address-based network-activity correlation the observer needs to be
+      node to the PLAT. In the vast majority of the cases, it means that
+      address is never visible outside of the network boundary. In order to perform
+      address-based network-activity correlation, the observer needs to be
       located in the same network as the CLAT node, or the PLAT needs to
       reside outside of the administrative domain, such as a public NAT64
       service.</t>
@@ -1035,7 +1041,7 @@ Current:
     <section anchor="IANA">
       <name>IANA Considerations</name>
 
-      <t>This memo does not introduce any requests to IANA.</t>
+      <t>This document has no IANA actions.</t>
     </section>
   </middle>
 

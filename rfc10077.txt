@@ -180,9 +180,8 @@ Table of Contents
    be used as a strong indication that the network supports PLAT (NAT64)
    functionality.  In some cases, a node might configure its IPv6 stack
    without receiving an RA (for example, via HTTP Capsules, see
-   [I-D.ietf-masque-connect-ip-dns]).  Therefore, an IPv6-only node
-   SHOULD enable CLAT as soon as it receives a PREF64 option from the
-   network.
+   [CONNECT-IP-PREF64]).  Therefore, an IPv6-only node SHOULD enable
+   CLAT as soon as it receives a PREF64 option from the network.
 
    Discussion: This document does not require that a node MUST enable
    CLAT upon receiving an RA because enabling CLAT by default may be
@@ -414,8 +413,8 @@ Table of Contents
 
    *  An ICMPv6 error packet from a global IPv6 address (not belonging
       to the NAT64 prefix) might be a response either to native IPv6
-      traffic from the host or to CLAT traffic (see
-      [I-D.ietf-v6ops-icmpext-xlat-v6only-source] for more details).
+      traffic from the host or to CLAT traffic (see [XLAT-SOURCE] for
+      more details).
 
    Therefore, in the absence of dedicated IPv6 addresses, the
    architecture would need additional stateful elements on the client
@@ -601,13 +600,13 @@ Table of Contents
 
    [RFC8978] discusses various examples of "flash renumbering", where
    the IPv6 prefix assigned to the link changes without explicit host
-   notification.  [I-D.ietf-6man-slaac-renum] and [I-D.link-6man-gulla]
-   discuss methods to mitigate the impact of flash renumbering.  These
-   methods generally rely on hosts with addresses from both old and new
-   prefixes ceasing the use of the old prefix and adopting the new
-   prefix.  For nodes running CLAT instances, this requires disabling
-   instances using addresses from the old prefix and creating an
-   instance using an address from the new prefix.
+   notification.  [SLAAC-RENUM] and [GULLA] discuss methods to mitigate
+   the impact of flash renumbering.  These methods generally rely on
+   hosts with addresses from both old and new prefixes ceasing the use
+   of the old prefix and adopting the new prefix.  For nodes running
+   CLAT instances, this requires disabling instances using addresses
+   from the old prefix and creating an instance using an address from
+   the new prefix.
 
    The CLAT node SHOULD use at least the following signals to detect
    link renumbering events:
@@ -740,7 +739,7 @@ Table of Contents
    There are no new operations or manageability requirements for mobile
    networks introduced by this document.  For non-mobile environments,
    such as datacenters, public Wi-Fi, or enterprise networks, the
-   operational considerations are documented in [I-D.ietf-v6ops-6mops].
+   operational considerations are documented in [6MOPS].
 
 11.  Security Considerations
 
@@ -1032,7 +1031,7 @@ Table of Contents
               Engineers", RFC 9958, DOI 10.17487/RFC9958, June 2026,
               <https://www.rfc-editor.org/info/rfc9958>.
 
-   [I-D.ietf-6man-slaac-renum]
+   [SLAAC-RENUM]
               Gont, F., Zorz, J., and R. Patterson, "Improving the
               Robustness of Stateless Address Autoconfiguration (SLAAC)
               to Flash Renumbering Events", Work in Progress, Internet-
@@ -1040,7 +1039,7 @@ Table of Contents
               <https://datatracker.ietf.org/doc/html/draft-ietf-6man-
               slaac-renum-14>.
 
-   [I-D.ietf-v6ops-icmpext-xlat-v6only-source]
+   [XLAT-SOURCE]
               Lamparter, D. E. and J. Linkova, "Using Dummy IPv4 Address
               and Node Identification Extensions for IP/ICMP translators
               (XLATs)", Work in Progress, Internet-Draft, draft-ietf-
@@ -1048,22 +1047,20 @@ Table of Contents
               <https://datatracker.ietf.org/doc/html/draft-ietf-v6ops-
               icmpext-xlat-v6only-source-03>.
 
-   [I-D.ietf-masque-connect-ip-dns]
+   [CONNECT-IP-PREF64]
               Schinazi, D. and Y. Rosomakho, "DNS and PREF64
               Configuration for Proxying IP in HTTP", Work in Progress,
               Internet-Draft, draft-ietf-masque-connect-ip-dns-07, 13
               October 2026, <https://datatracker.ietf.org/doc/html/
               draft-ietf-masque-connect-ip-dns-07>.
 
-   [I-D.ietf-v6ops-6mops]
-              Buraglio, N., Caletka, O., and J. Linkova, "IPv6-mostly
+   [6MOPS]    Buraglio, N., Caletka, O., and J. Linkova, "IPv6-mostly
               Networks: Deployment and Operations Considerations", Work
               in Progress, Internet-Draft, draft-ietf-v6ops-6mops-12, 29
               October 2026, <https://datatracker.ietf.org/doc/html/
               draft-ietf-v6ops-6mops-12>.
 
-   [I-D.link-6man-gulla]
-              Linkova, J., "Using Prefix-Specific Link-Local Addresses
+   [GULLA]    Linkova, J., "Using Prefix-Specific Link-Local Addresses
               to Improve SLAAC Robustness", Work in Progress, Internet-
               Draft, draft-link-6man-gulla-01, 3 March 2025,
               <https://datatracker.ietf.org/doc/html/draft-link-6man-

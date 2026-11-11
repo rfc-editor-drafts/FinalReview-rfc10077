@@ -1050,6 +1050,11 @@ or left in their current order?
 -->
 
   <back>
+    <displayreference target="I-D.ietf-6man-slaac-renum" to="SLAAC-RENUM"/>
+    <displayreference target="I-D.ietf-v6ops-icmpext-xlat-v6only-source" to="XLAT-SOURCE"/>
+    <displayreference target="I-D.ietf-masque-connect-ip-dns" to="CONNECT-IP-PREF64"/>
+    <displayreference target="I-D.ietf-v6ops-6mops" to="6MOPS"/>
+    <displayreference target="I-D.link-6man-gulla" to="GULLA"/>
     <references>
       <name>References</name>
 
